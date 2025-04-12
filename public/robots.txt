@@ -1,0 +1,28 @@
+# robots.txt for RC MEGA
+# https://www.rcmega.com
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Optimize crawling
+Crawl-delay: 1
+
+# Allow product pages
+Allow: /products/
+
+# Disallow duplicate URLs with query parameters except for essential filters
+Disallow: /*?ref=*
+Disallow: /*&ref=*
+
+# Block specific folders
+Disallow: /admin/
+Disallow: /private/
+Disallow: /temp/
+Disallow: /draft/
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://www.rcmega.com/sitemap.xml
