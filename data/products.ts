@@ -1,13 +1,15 @@
+import { ISparePart } from "@/types/product";
+
 export interface Accessory {
   slug: string;
-  id: string;
+  _id: string;
   name: string;
   sku: string;
   price: number;
   stock: number;
   outOfStock: boolean;
   categories: string[];
-  compatibleProductIds: string[]; // Array of product IDs this accessory is compatible with
+  compatibleProductIds: string[]; // Array of product _ids this accessory is compatible with
   brand: string;
   description: string;
   media: {
@@ -27,7 +29,7 @@ export interface Accessory {
 
 // Define the SparePart interface
 export interface SparePart {
-  id: string;
+  _id: string;
   slug: string;
   name: string;
   sku: string;
@@ -35,7 +37,7 @@ export interface SparePart {
   stock: number;
   outOfStock: boolean;
   categories: string[];
-  compatibleProductIds: string[]; // Array of product IDs this part is compatible with
+  compatibleProductIds: string[]; // Array of product _ids this part is compatible with
   brand: string;
   description: string;
   media: {
@@ -52,9 +54,9 @@ export interface SparePart {
 }
 
 
-// Update Product interface to include an ID field
+// Update Product interface to include an _id field
 export interface Product {
-  id: string; // Added ID field
+  _id: string; // Added _id field
   name: string;
   brand: string;
   color: string;
@@ -67,7 +69,7 @@ export interface Product {
     type: "image" | "video" | "instagram";
     url: string;
   }[];
-  socialLinks: {
+  socialLinks?: {
     instagram?: string;
     facebook?: string;
     youtube?: string;
@@ -98,7 +100,7 @@ export interface Product {
 
 export const products: Product[] = [
   {
-    id: "prod001",
+    _id: "prod001",
     name: "FMS 1:12 2006 Hummer H1 Alpha RS",
     brand: "FMS",
     color: "Black",
@@ -142,7 +144,7 @@ export const products: Product[] = [
     },
     technicalSpecs: [
       'Length: 408mm',
-      'Width: 222mm',
+      'width: 222mm',
       'Height: 162mm',
       'Wheelbase: 272mm',
       'Tire F/R: Φ 78 × 25mm',
@@ -157,7 +159,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod002",
+    _id: "prod002",
     name: "FMS 1:24 FCX24 Mercedes-Benz Unimog 421",
     brand: "FMS",
     color: "Green",
@@ -180,7 +182,7 @@ export const products: Product[] = [
     },
     technicalSpecs: [
       'Length: 249 mm',
-      'Width: 153 mm',
+      'width: 153 mm',
       'Height: 160 mm',
       'Wheelbase: 142 mm',
       'Tire (F/R): Φ 20 mm',
@@ -193,7 +195,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod003",
+    _id: "prod003",
     name: "MJX Hyper Go 10208 V2 Monster 4WD RC Car 1/10 80km/h- RC",
     brand: "MJX",
     color: "White",
@@ -232,7 +234,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod004",
+    _id: "prod004",
     name: "MJX Hyper Go 16210, 1/16 Brushless RC 4WD High Speed Off-Road Truggy Truck India",
     brand: "MJX",
     color: "Black",
@@ -274,7 +276,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod005",
+    _id: "prod005",
     name: "MJX Hyper Go 16209",
     brand: "MJX",
     color: "Blue",
@@ -311,7 +313,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod006",
+    _id: "prod006",
     name: "MJX Hyper Go 16208",
     brand: "MJX",
     color: "Blue",
@@ -352,7 +354,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod007",
+    _id: "prod007",
     name: "MJX Hyper Go 14210 V3",
     brand: "MJX",
     color: "Black",
@@ -402,7 +404,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod008",
+    _id: "prod008",
     name: "MJX Hyper Go 20208",
     brand: "MJX",
     color: "Black",
@@ -437,7 +439,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod009",
+    _id: "prod009",
     name: "MJX Hyper Go 14303",
     brand: "MJX",
     color: "Black",
@@ -479,7 +481,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "prod0010",
+    _id: "prod0010",
     name: "MJX Hyper Go 14302",
     brand: "MJX",
     color: "white",
@@ -517,14 +519,14 @@ export const products: Product[] = [
       'Servo: 17g digital servo',
       'Differentials: Front differential only',
       'Chassis: 320x153x115 mm; Wheelbase 192mm; Tire Diameter 58mm',
-      'Tires: High grip TPR and drift-specific tires (sets provided)',
+      'Tires: High grip TPR and drift-specific tires (sets prov_ided)',
       'Body Shell: High-quality, crack-resistant plastic body',
       'Battery Requirements: 7.4V 2000mAh 2S battery (upgrade option for 3S available); Remote – requires 2 AA batteries (not included)'
 
     ]
   },
   {
-    id: "prod0011",
+    _id: "prod0011",
     name: "MJX Hyper Go 14301",
     brand: "MJX",
     color: "white",
@@ -561,7 +563,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "prod0012",
+    _id: "prod0012",
     name: "FSR 1:8 Mustang GT 6S Brushless",
     brand: "FSR",
     color: "Blue",
@@ -601,7 +603,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod0013",
+    _id: "prod0013",
     name: "Rlaarlo AM-D12 1:12 Brushless Desert Truck",
     brand: "Rlaarlo",
     color: "Pink",
@@ -642,7 +644,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod0014",
+    _id: "prod0014",
     name: "Rlaarlo AM-X12 1:12 Brushless Buggy (Carbon Fiber)",
     brand: "Rlaarlo",
     color: "Blue",
@@ -685,7 +687,7 @@ export const products: Product[] = [
     ],
   },
   {
-    id: "prod0015",
+    _id: "prod0015",
     name: "Rlaarlo ROG1 1:14 Scale Brushless RTR Monster Truck",
     brand: "Rlaarlo",
     color: "Red/Black",
@@ -732,7 +734,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "prod0030",
+    _id: "prod0030",
     name: "MJX Hyper Go H12Y 1/12 Scale RC Car High-Torque 3650 Brushless BLDC Motor Aluminum Shell (Black)",
     brand: "MJX",
     color: "Black",
@@ -778,7 +780,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "prod0016",
+    _id: "prod0016",
     name: "MJX Hyper Go H12Y+ 1/12 Scale RC Car High-Torque 3650 Brushless BLDC Motor Aluminum Shell (Yellow)",
     brand: "MJX",
     color: "Yellow",
@@ -826,7 +828,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "prod0017",
+    _id: "prod0017",
     name: "MNRC MN82S RC Crawler 1/12 Scale 2.4G 4WD Off-Road",
     brand: "MNRC",
     color: "Grey",
@@ -869,7 +871,7 @@ export const products: Product[] = [
   },
 
   {
-    id: "prod0018",
+    _id: "prod0018",
     name: "MNRC MN82 RTR 1/12 2.4G 4WD RC Car TOYOTA Land Cruiser LC79 Rock Crawler India",
     brand: "MNRC",
     color: "Red",
@@ -913,7 +915,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "prod0019",
+    _id: "prod0019",
     name: "RGT EX86130 PRO RUNNER 4X4 RC Rock Crawler 1/10 Scale Electric Car - Brushed 3S - 6 Channel",
     brand: "RGT",
     color: "Red/Blue",
@@ -954,7 +956,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "prod0020",
+    _id: "prod0020",
     name: "1:10 RGT 136100 PRO (SHOOTER) Brushless Crawler",
     brand: "RGT",
     color: "Blue/Pink",
@@ -1000,7 +1002,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "prod0021",
+    _id: "prod0021",
     name: "LDRC LD1899 GTR R34 1/18 Scale High Speed RWD RC Drift Car RTR- India",
     brand: "LDRC",
     color: "Blue/Silver",
@@ -1058,10 +1060,10 @@ export const products: Product[] = [
 ]
 
 
-// Create sample spare parts data with product ID references
-export const spareParts: SparePart[] = [
+// Create sample spare parts data with product _id references
+export const spareParts: ISparePart[] = [
   {
-    id: "sp001",
+    _id: "sp001",
     slug: "fms-hummer-h1-wheel-set",
     name: "FMS Hummer H1 Wheel Set (4pcs)",
     sku: "FMS-H1-WHL-001",
@@ -1084,7 +1086,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp002",
+    _id: "sp002",
     slug: "fms-hummer-h1-motor-370-brushed",
     name: "FMS Hummer H1 Motor 370 Brushed",
     sku: "FMS-H1-MTR-370",
@@ -1107,7 +1109,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp003",
+    _id: "sp003",
     slug: "rgt-136100-pro-brushless-motor",
     name: "RGT 136100 PRO Brushless Motor",
     sku: "RGT-136100-MTR-BL",
@@ -1130,7 +1132,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp004",
+    _id: "sp004",
     slug  : "rgt-136100-pro-body-shell-blue",
     name: "RGT Crawler Body Shell - Blue",
     sku: "RGT-136100-BODY-BLUE",
@@ -1153,7 +1155,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp005",
+    _id: "sp005",
     slug: "rgt-136100-pro-body-shell-pink",
     name: "RGT Crawler Body Shell - Pink",
     sku: "RGT-136100-BODY-PINK",
@@ -1176,7 +1178,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp006",
+    _id: "sp006",
     slug: "ldrc-ld1899-gtr-r34-body-shell-blue",
     name: "LDRC LD1899 GTR R34 Body Shell - Blue",
     sku: "LDRC-LD1899-BODY-BLUE",
@@ -1199,7 +1201,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp007",
+    _id: "sp007",
     slug: "ldrc-ld1899-gtr-r34-body-shell-silver",
     name: "LDRC LD1899 GTR R34 Body Shell - Silver",
     sku: "LDRC-LD1899-BODY-SILVER",
@@ -1222,7 +1224,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp008",
+    _id: "sp008",
     slug: "ldrc-ld1899-drift-tires",
     name: "LDRC LD1899 Drift Tire Set (4pcs)",
     sku: "LDRC-LD1899-TIRE-DRIFT",
@@ -1245,7 +1247,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp009",
+    _id: "sp009",
     slug: "universal-rc-battery-7-2v-1800mah",
     name: "Universal RC Battery 7.2V 1800mAh",
     sku: "BATT-7.2V-1800MAH",
@@ -1268,7 +1270,7 @@ export const spareParts: SparePart[] = [
     }
   },
   {
-    id: "sp010",
+    _id: "sp010",
     slug: "universal-rc-battery-7-4v-2200mah",
     name: "Universal RC Car Charger",
     sku: "CHRGR-UNIV-1",
@@ -1297,7 +1299,7 @@ export const spareParts: SparePart[] = [
 // Create sample accessories data
 export const accessories: Accessory[] = [
   {
-    id: "acc001",
+    _id: "acc001",
     slug: "rc-display-stand-universal-1-10-scale",
     name: "RC Display Stand - Universal (1:10 Scale)",
     sku: "DISPLAY-110-UNIV",
@@ -1320,7 +1322,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc002",
+    _id: "acc002",
     name: "RC Display Stand - Universal (1:12 Scale)",
     slug: "rc-display-stand-universal-1-12-scale",
     sku: "DISPLAY-112-UNIV",
@@ -1343,7 +1345,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc003",
+    _id: "acc003",
     slug: "rc-display-stand-universal-1-18-scale",
     name: "RC Display Stand - Universal (1:18 Scale)",
     sku: "DISPLAY-118-UNIV",
@@ -1366,7 +1368,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc004",
+    _id: "acc004",
     slug: "carrying-case-for-1-10-scale-crawler",
     name: "Carrying Case for 1:10 Scale Crawler",
     sku: "CASE-110-CRWLR",
@@ -1389,7 +1391,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc005",
+    _id: "acc005",
     slug: "carrying-case-for-1-12-scale-models",
     name: "Carrying Case for 1:12 Scale Models",
     sku: "CASE-112-UNIV",
@@ -1412,7 +1414,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc006",
+    _id: "acc006",
     slug: "drift-car-carrying-case-1-18-scale",
     name: "Drift Car Carrying Case (1:18 Scale)",
     sku: "CASE-118-DRIFT",
@@ -1435,7 +1437,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc007",
+    _id: "acc007",
     slug: "led-light-kit-for-hummer-h1",
     name: "LED Light Kit for Hummer H1",
     sku: "LED-HUMMER-H1",
@@ -1458,7 +1460,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc008",
+    _id: "acc008",
     slug: "led-light-kit-for-drift-cars",
     name: "LED Light Kit for Drift Cars",
     sku: "LED-DRIFT-118",
@@ -1481,7 +1483,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc009",
+    _id: "acc009",
     slug: "rc-scale-driver-figure-1-10",
     name: "RC Scale Driver Figure (1:10)",
     sku: "FIGURE-DRIVER-110",
@@ -1504,7 +1506,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc010",
+    _id: "acc010",
     slug: "magnetic-body-mount-kit",
     name: "Magnetic Body Mount Kit",
     sku: "MOUNT-MAG-UNIV",
@@ -1527,7 +1529,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc011",
+    _id: "acc011",
     slug: "rc-car-maintenance-tool-kit",
     name: "RC Car Maintenance Tool Kit",
     sku: "TOOL-KIT-RC-1",
@@ -1550,7 +1552,7 @@ export const accessories: Accessory[] = [
     }
   },
   {
-    id: "acc012",
+    _id: "acc012",
     slug: "waterproof-electronics-cover-kit-1-10-scale",
     name: "Waterproof Electronics Cover Kit (1:10 Scale)",
     sku: "COVER-WATERPROOF-110",
@@ -1574,9 +1576,9 @@ export const accessories: Accessory[] = [
   }
 ];
 
-// Function to get accessories for a specific product by product ID
-export function getAccessoriesForProduct(productId: string): Accessory[] {
-  return accessories.filter(accessory => accessory.compatibleProductIds.includes(productId));
+// Function to get accessories for a specific product by product _id
+export function getAccessoriesForProduct(product_id: string): Accessory[] {
+  return accessories.filter(accessory => accessory.compatibleProductIds.includes(product_id));
 }
 
 // Example of how to extend the Product interface to include accessories
@@ -1588,13 +1590,13 @@ export interface ProductWithAccessories extends ProductWithSpareParts {
 export function enrichProductsWithAccessories(productsList: ProductWithSpareParts[]): ProductWithAccessories[] {
   return productsList.map(product => ({
     ...product,
-    compatibleAccessories: getAccessoriesForProduct(product.id)
+    compatibleAccessories: getAccessoriesForProduct(product._id)
   }));
 }
 
-// Get accessory by ID
-export function getAccessoryById(accessoryId: string): Accessory | undefined {
-  return accessories.find(accessory => accessory.id === accessoryId);
+// Get accessory by _id
+export function getAccessoryBy_id(accessory_id: string): Accessory | undefined {
+  return accessories.find(accessory => accessory._id === accessory_id);
 }
 
 
@@ -1604,50 +1606,50 @@ export const accessoryCategories = Array.from(
 );
 
 // Function to get a complete product with both spare parts and accessories
-export function getCompleteProductInfo(productId: string): ProductWithAccessories | undefined {
-  const product = getProductById(productId);
+export function getCompleteProductInfo(product_id: string): ProductWithAccessories | undefined {
+  const product = getProductBy_id(product_id);
   if (!product) return undefined;
   
   const withSpareParts: ProductWithSpareParts = {
     ...product,
-    compatibleSpareParts: getSparePartsForProduct(productId)
+    compatibleSpareParts: getSparePartsForProduct(product_id)
   };
   
   const withAccessories: ProductWithAccessories = {
     ...withSpareParts,
-    compatibleAccessories: getAccessoriesForProduct(productId)
+    compatibleAccessories: getAccessoriesForProduct(product_id)
   };
   
   return withAccessories;
 }
 
-// Function to get spare parts for a specific product by product ID
-export function getSparePartsForProduct(productId: string): SparePart[] {
-  return spareParts.filter(part => part.compatibleProductIds.includes(productId));
+// Function to get spare parts for a specific product by product _id
+export function getSparePartsForProduct(product_id: string): ISparePart[] {
+  return spareParts.filter(part => part.compatibleProductIds.includes(product_id));
 }
 
 // Example of how to extend the Product interface to include spare parts
 export interface ProductWithSpareParts extends Product {
-  compatibleSpareParts?: SparePart[];
+  compatibleSpareParts?: ISparePart[];
 }
 
 // Function to enrich products with their compatible spare parts
 export function enrichProductsWithSpareParts(productsList: Product[]): ProductWithSpareParts[] {
   return productsList.map(product => ({
     ...product,
-    compatibleSpareParts: getSparePartsForProduct(product.id)
+    compatibleSpareParts: getSparePartsForProduct(product._id)
   }));
 }
 
-// Get product by ID
-export function getProductById(productId: string): Product | undefined {
-  return products.find(product => product.id === productId);
+// Get product by _id
+export function getProductBy_id(product_id: string): Product | undefined {
+  return products.find(product => product._id === product_id);
 }
 
 
-// Get spare part by ID
-export function getSparePartById(sparePartId: string): SparePart | undefined {
-  return spareParts.find(part => part.id === sparePartId);
+// Get spare part by _id
+export function getSparePartBy_id(sparePart_id: string): ISparePart | undefined {
+  return spareParts.find(part => part._id === sparePart_id);
 }
 
 // Categories of spare parts for filtering
@@ -1658,7 +1660,7 @@ export const sparePartCategories = Array.from(
 
 
 // Get spare part by slug
-export function getSparePartBySlug(sparePartSlug: string): SparePart | undefined {
+export function getSparePartBySlug(sparePartSlug: string): ISparePart | undefined {
   return spareParts.find((part) => part.slug === sparePartSlug)
 }
 
@@ -1680,7 +1682,7 @@ export const brandLogos: { [key: string]: string } = {
   "FSR": "/products/Brand/FSR/logo/images.png",
   "Losi": "/products/Brand/FMS/logo/fmslogo.svg",
   "FMS": "/products/Brand/FMS/logo/fmslogo.svg",
-  "MJX": "/products/Brand/MJX/logo/mjxlogo.png",
+  "MJX Hyper Go": "/products/Brand/MJX/logo/mjxlogo.png",
   "Traxxas": "/products/Brand/traxxas/logo/traxxas-vector-logo-xs.png",
   "LDRC": "/products/Brand/LDRC/logo/ldrclogo.png",
   "MNRC": "/products/Brand/MNRC/logo/MN-Logo.png",

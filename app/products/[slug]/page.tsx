@@ -5,12 +5,6 @@ import { useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp, FaShare } from "react-icons/fa"
-import {
-  getCompleteProductInfo,
-  type ProductWithAccessories,
-  brandLogos,
-  products, // Import the products array
-} from "@/data/products"
 import { Swiper, SwiperSlide } from "swiper/react"
 import type { Swiper as SwiperType } from "swiper"
 import { A11y, Keyboard, Pagination, Thumbs } from "swiper/modules"
@@ -22,52 +16,103 @@ import DuHeader from "@/components/DuHeader"
 import Head from "next/head"
 import AccessoriesSection from "@/components/accessories-section"
 import SparePartsSection from "@/components/spare-parts-section"
+import { brandLogos as BrandLogos } from "@/data/products"
+import { IAccessory, ISparePart, IDimensions, IMedia } from "@/types/product"
+
+// Define interfaces
+export interface Product {
+  _id: string
+  id: string
+  name: string
+  sku: string
+  description: string
+  categories: string[]
+  brand: string
+  color: string
+  modelCode: string
+  scale: string
+  stock: number
+  OutOfStock: boolean
+  price: number
+  slug: string
+  media: IMedia[]
+  socialLinks?: {
+    instagram?: string
+    facebook?: string
+    youtube?: string
+  }
+  technicalSpecs: string[]
+  weight: number
+  dimensions: IDimensions
+  discountPercentage?: number
+  finalPrice?: number
+  compatibleAccessories?: IAccessory[]
+  compatibleSpareParts?: ISparePart[]
+}
 
 export default function ProductPage() {
   const params = useParams()
-  const [product, setProduct] = useState<ProductWithAccessories | null>(null)
+  const [product, setProduct] = useState<Product | null>(null)
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
-
   const videoRef = useVideoAutoplay()
 
   useEffect(() => {
-    if (params.slug) {
-      // Find the product ID based on slug
-      const productId = getProductIdBySlug(params.slug as string)
-      if (productId) {
-        const completeProduct = getCompleteProductInfo(productId)
-        setProduct(completeProduct || null)
-      } else {
-        setProduct(null)
+    async function fetchProduct() {
+      if (params.slug) {
+        try { 
+          // Fetch product by slug
+          const resSlug = await fetch(`http://localhost:5001/api/products/slug/${params.slug}`)
+          const slugResponse = await resSlug.json()
+          let productData = null
+          
+          // Handle case where the response is an array
+          if (Array.isArray(slugResponse)) {
+            if (slugResponse.length > 0 && slugResponse[0].success && slugResponse[0].data) {
+              productData = slugResponse[0].data
+            }
+          } else if (slugResponse.success && slugResponse.data) {
+            productData = slugResponse.data
+          }
+          
+          if (productData) {
+            // Extract product id (assign id property if missing)
+            const productId = productData.id || productData._id
+            // Optionally, ensure productData has an "id" field
+            productData = { ...productData, id: productId }
+
+            // Fetch complete product info (with spare parts and accessories)
+            const resComplete = await fetch(`http://localhost:5001/api/products/${productId}/complete`)
+            const completeResponse = await resComplete.json()
+            if (completeResponse.success && completeResponse.data) {
+              setProduct(completeResponse.data)
+            } else {
+              setProduct(null)
+            }
+          } else {
+            setProduct(null)
+          }
+        } catch (error) {
+          console.error("Error fetching product details:", error)
+          setProduct(null)
+        }
       }
     }
+    fetchProduct()
   }, [params.slug])
-
-  // Helper function to get product ID by slug
-  const getProductIdBySlug = (slug: string) => {
-    // This is a placeholder - you'll need to implement this based on your data structure
-    // For example, you might need to search through your products array to find the matching slug
-    const foundProduct = products.find((p) => p.slug === slug)
-    return foundProduct?.id
-  }
 
   const handleShare = () => {
     const url = window.location.href
     if (navigator.share) {
-      navigator
-        .share({
+      navigator.share({
           title: product ? `${product.name} - RC MEGA` : "RC MEGA Product",
-          text: product
-            ? `Check out this ${product.brand} ${product.name} from RC MEGA!`
-            : "Check out this product from RC MEGA!",
+          text: product ? `Check out this ${product.brand} ${product.name} from RC MEGA!` : "Check out this product from RC MEGA!",
           url: url,
-        })
-        .catch(() => {
+      }).catch(() => {
           navigator.clipboard.writeText(url)
           setShowShareTooltip(true)
           setTimeout(() => setShowShareTooltip(false), 2000)
-        })
+      })
     } else {
       navigator.clipboard.writeText(url)
       setShowShareTooltip(true)
@@ -109,6 +154,7 @@ export default function ProductPage() {
     mpn: product.modelCode,
   }
 
+  // Prepare messages for WhatsApp actions
   const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Please provide more details.`
   const notifyMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Please notify me when it's back in stock.`
 
@@ -125,7 +171,7 @@ export default function ProductPage() {
           property="og:description"
           content={`Explore the ${product.name} by ${product.brand}. Scale: ${product.scale}, Color: ${product.color}. Premium RC model from RC MEGA.`}
         />
-        <meta property="og:image" content={product.media[0].url} />
+        <meta property="og:image" content={product.media[0]?.url} />
         <meta property="og:type" content="product" />
         <meta property="og:price:amount" content={product.price.toString()} />
         <meta property="og:price:currency" content="INR" />
@@ -181,10 +227,7 @@ export default function ProductPage() {
                     OUT OF STOCK
                   </div>
                 )}
-
-                <h2 id="product-images" className="sr-only">
-                  Product images
-                </h2>
+                <h2 id="product-images" className="sr-only">Product images</h2>
                 <Swiper
                   modules={[A11y, Keyboard, Pagination, Thumbs]}
                   a11y={{
@@ -192,10 +235,7 @@ export default function ProductPage() {
                     nextSlideMessage: "Next product image",
                     paginationBulletMessage: "Go to image {{index}}",
                   }}
-                  keyboard={{
-                    enabled: true,
-                    onlyInViewport: true,
-                  }}
+                  keyboard={{ enabled: true, onlyInViewport: true }}
                   pagination={{ clickable: true }}
                   thumbs={{ swiper: thumbsSwiper }}
                   className="rounded-t-2xl lg:rounded-tr-none lg:rounded-l-2xl overflow-hidden"
@@ -208,10 +248,7 @@ export default function ProductPage() {
                             <video
                               ref={videoRef}
                               className="w-full h-full object-cover"
-                              controls
-                              muted
-                              playsInline
-                              preload="metadata"
+                              controls muted playsInline preload="metadata"
                               title={`${product.name} video demonstration`}
                             >
                               <source src={media.url} type="video/mp4" />
@@ -228,8 +265,7 @@ export default function ProductPage() {
                                 src={`https://www.instagram.com/reel/${media.url}/embed/`}
                                 className="w-full h-full object-cover instagram-reel-iframe"
                                 title={`Instagram Reel - ${product.name}`}
-                                allow="autoplay; encrypted-media"
-                                allowFullScreen
+                                allow="autoplay; encrypted-media" allowFullScreen
                                 style={{ minHeight: "500px" }}
                               />
                             </div>
@@ -241,45 +277,31 @@ export default function ProductPage() {
                           <Image
                             src={media.url || "/placeholder.svg"}
                             alt={`${product.name} - Detailed view ${index + 1}`}
-                            fill
-                            className="object-contain"
-                            sizes="(max-width: 1024px) 100vw, 50vw"
-                            priority={index === 0}
+                            fill className="object-contain"
+                            sizes="(max-width: 1024px) 100vw, 50vw" priority={index === 0}
                           />
                         )}
                       </div>
                     </SwiperSlide>
                   ))}
                 </Swiper>
-
                 <div className="p-4 bg-black/20">
                   <Swiper
                     onSwiper={setThumbsSwiper}
-                    spaceBetween={10}
-                    slidesPerView={4}
-                    watchSlidesProgress
+                    spaceBetween={10} slidesPerView={4} watchSlidesProgress
                     className="thumbnail-swiper"
-                    a11y={{
-                      containerRoleDescriptionMessage: "Product thumbnail images",
-                    }}
+                    a11y={{ containerRoleDescriptionMessage: "Product thumbnail images" }}
                   >
                     {product.media.map((media, index) => (
-                      <SwiperSlide
-                        key={index}
-                        className="cursor-pointer"
-                        role="button"
-                        tabIndex={0}
-                        aria-label={`View product image ${index + 1}`}
-                      >
+                      <SwiperSlide key={index} className="cursor-pointer" role="button"
+                        tabIndex={0} aria-label={`View product image ${index + 1}`}>
                         <div className="relative aspect-square border-2 border-transparent rounded-lg overflow-hidden transition-all hover:border-yellow-500 group">
                           {media.type === "image" ? (
                             <Image
                               src={media.url || "/placeholder.svg"}
                               alt={`Thumbnail view of ${product.name} - ${index + 1}`}
-                              fill
-                              className="object-cover"
-                              sizes="(max-width: 640px) 25vw, 150px"
-                              loading="lazy"
+                              fill className="object-cover"
+                              sizes="(max-width: 640px) 25vw, 150px" loading="lazy"
                             />
                           ) : media.type === "video" ? (
                             <div className="bg-gray-800 h-full flex items-center justify-center">
@@ -303,15 +325,12 @@ export default function ProductPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                     <Image
-                      src={brandLogos[product.brand] || "/placeholder.svg"}
+                      src={BrandLogos[product.brand] || "/placeholder.svg"}
                       alt={`${product.brand} logo`}
-                      width={24}
-                      height={24}
-                      className="h-6 w-6 object-contain"
+                      width={24} height={24} className="h-6 w-6 object-contain"
                     />
                     <span className="text-sm text-white font-medium">{product.brand}</span>
                   </div>
-
                   {product.OutOfStock ? (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
                       Out of Stock
@@ -355,8 +374,7 @@ export default function ProductPage() {
                   {product.OutOfStock ? (
                     <a
                       href={`https://wa.me/917737373639?text=${encodeURIComponent(notifyMessage)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target="_blank" rel="noopener noreferrer"
                       className="w-full bg-blue-600 text-white py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors shadow-lg"
                       aria-label={`Request notification when ${product.name} is back in stock`}
                     >
@@ -366,8 +384,7 @@ export default function ProductPage() {
                   ) : (
                     <a
                       href={`https://wa.me/917737373639?text=${encodeURIComponent(whatsappMessage)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target="_blank" rel="noopener noreferrer"
                       className="w-full bg-green-600 text-white py-4 px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-green-700 transition-colors shadow-lg hover:shadow-green-100"
                       aria-label={`Contact via WhatsApp to purchase ${product.name}`}
                     >
@@ -383,14 +400,11 @@ export default function ProductPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {product.technicalSpecs.map((spec, index) => (
                       <div key={index} className="flex items-start bg-white/5 p-3 rounded-lg">
-                        <svg
-                          className="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        <svg className="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round"
+                            strokeWidth="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                         <span className="text-white text-sm">{spec}</span>
                       </div>
@@ -400,41 +414,32 @@ export default function ProductPage() {
 
                 {/* Social Links */}
                 <div className="border-t border-white/10 pt-6">
-                  <h3 className="text-lg text-white font-semibold mb-4">Follow Us Our Socials</h3>
+                  <h3 className="text-lg text-white font-semibold mb-4">Follow Our Socials</h3>
                   <div className="flex gap-4">
-                    {product.socialLinks.facebook && (
-                      <a
-                        href={product.socialLinks.facebook}
-                        target="_blank"
+                    
+                      <a href={"https://www.facebook.com/rcmegaofficial"} target="_blank"
                         rel="noopener noreferrer"
                         className="bg-white/10 hover:bg-blue-600/30 text-white p-3 rounded-full transition-colors"
-                        aria-label={`Visit ${product.brand}'s Facebook page`}
-                      >
+                        aria-label={`Visit ${product.brand}'s Facebook page`}>
                         <FaFacebook className="text-xl" />
                       </a>
-                    )}
-                    {product.socialLinks.instagram && (
-                      <a
-                        href={product.socialLinks.instagram}
-                        target="_blank"
+
+                    
+                      <a href={"https://www.instagram.com/rcmegaofficial/"} target="_blank"
                         rel="noopener noreferrer"
                         className="bg-white/10 hover:bg-pink-600/30 text-white p-3 rounded-full transition-colors"
-                        aria-label={`Check ${product.brand}'s Instagram profile`}
-                      >
+                        aria-label={`Check ${product.brand}'s Instagram profile`}>
                         <FaInstagram className="text-xl" />
                       </a>
-                    )}
-                    {product.socialLinks.youtube && (
-                      <a
-                        href={product.socialLinks.youtube}
-                        target="_blank"
+
+
+                      <a href={"https://www.youtube.com/@rcmegaofficial"} target="_blank"
                         rel="noopener noreferrer"
                         className="bg-white/10 hover:bg-red-600/30 text-white p-3 rounded-full transition-colors"
-                        aria-label={`Watch videos on ${product.brand}'s YouTube channel`}
-                      >
+                        aria-label={`Watch videos on ${product.brand}'s YouTube channel`}>
                         <FaYoutube className="text-xl" />
                       </a>
-                    )}
+
                   </div>
                 </div>
               </section>
@@ -444,20 +449,16 @@ export default function ProductPage() {
           {/* Compatible Accessories Section */}
           {product.compatibleAccessories && product.compatibleAccessories.length > 0 && (
             <div className="mt-10">
-              <AccessoriesSection
-                accessories={product.compatibleAccessories}
-                title={`Compatible Accessories for ${product.name}`}
-              />
+              <AccessoriesSection accessories={product.compatibleAccessories}
+                title={`Compatible Accessories for ${product.name}`} />
             </div>
           )}
 
           {/* Compatible Spare Parts Section */}
           {product.compatibleSpareParts && product.compatibleSpareParts.length > 0 && (
             <div className="mt-10">
-              <SparePartsSection
-                spareParts={product.compatibleSpareParts}
-                title={`Compatible Spare Parts for ${product.name}`}
-              />
+              <SparePartsSection spareParts={product.compatibleSpareParts}
+                title={`Compatible Spare Parts for ${product.name}`} />
             </div>
           )}
         </main>

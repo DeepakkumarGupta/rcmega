@@ -1,24 +1,42 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { spareParts, sparePartCategories } from "@/data/products"
 import SparePartCard from "@/components/spare-part-card"
 import { Grid, List, Search } from "lucide-react"
 import DuHeader from "@/components/DuHeader"
 import Footer from "@/components/Footer"
 import Head from "next/head"
+import { ISparePart } from "@/types/product"
 
 export default function SparePartsPage() {
-  const [filteredSpareParts, setFilteredSpareParts] = useState(spareParts)
+  const [spareParts, setSpareParts] = useState<ISparePart[]>([])
+  const [sparePartCategories, setSparePartCategories] = useState<{ _id: string; name: string }[]>([])
+  const [filteredSpareParts, setFilteredSpareParts] = useState<ISparePart[]>([])
   const [sortBy, setSortBy] = useState("best-selling")
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [layout, setLayout] = useState<"grid" | "list">("grid")
 
   useEffect(() => {
-    let filtered = [...spareParts]
+    async function fetchData() {
+      try {
+        const [spRes, catRes] = await Promise.all([
+          fetch("http://localhost:5001/api/spare-parts"),
+          fetch("http://localhost:5001/api/categoriessparepart"),
+        ])
+        const spJson = await spRes.json()
+        const catJson = await catRes.json()
+        if (spJson.success) setSpareParts(spJson.data)
+        if (catJson.success) setSparePartCategories(catJson.data)
+      } catch (error) {
+        console.error("Error fetching spare parts or categories", error)
+      }
+    }
+    fetchData()
+  }, [])
 
-    // Apply search filter
+  useEffect(() => {
+    let filtered = [...spareParts]
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(
@@ -29,13 +47,9 @@ export default function SparePartsPage() {
           p.categories.some((category) => category.toLowerCase().includes(query)),
       )
     }
-
-    // Apply category filter
     if (categoryFilter) {
       filtered = filtered.filter((p) => p.categories.includes(categoryFilter))
     }
-
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
@@ -47,9 +61,8 @@ export default function SparePartsPage() {
           return 0
       }
     })
-
     setFilteredSpareParts(filtered)
-  }, [sortBy, categoryFilter, searchQuery])
+  }, [spareParts, sortBy, categoryFilter, searchQuery])
 
   return (
     <>
@@ -141,8 +154,8 @@ export default function SparePartsPage() {
                     >
                       <option value="">All Categories</option>
                       {sparePartCategories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
+                        <option key={category._id} value={category.name}>
+                          {category.name}
                         </option>
                       ))}
                     </select>
@@ -179,7 +192,7 @@ export default function SparePartsPage() {
             }
           >
             {filteredSpareParts.map((sparePart) => (
-              <SparePartCard key={sparePart.id} sparePart={sparePart} layout={layout} />
+              <SparePartCard key={sparePart._id} sparePart={sparePart} layout={layout} />
             ))}
           </div>
 

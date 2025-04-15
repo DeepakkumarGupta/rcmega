@@ -3,13 +3,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import { FaWhatsapp } from "react-icons/fa6"
-import type { Accessory } from "@/data/products"
+import { IAccessory } from "@/types/product"
 
 export default function AccessoryCard({
   accessory,
   layout = "grid",
 }: {
-  accessory: Accessory
+  accessory: IAccessory
   layout?: "grid" | "list"
 }) {
   const whatsappMessage = `Hi! I'm interested in the accessory: ${accessory.name} (${accessory.sku}). Price: ₹${accessory.price.toLocaleString()}. Can you provide more details?`

@@ -1,19 +1,40 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { accessories, accessoryCategories } from "@/data/products"
 import AccessoryCard from "@/components/accessory-card"
 import { Grid, List, Search } from "lucide-react"
 import DuHeader from "@/components/DuHeader"
 import Footer from "@/components/Footer"
 import Head from "next/head"
+import { IAccessory, ICategoryAccessory } from "@/types/product"
 
 export default function AccessoriesPage() {
-  const [filteredAccessories, setFilteredAccessories] = useState(accessories)
+  const [accessories, setAccessories] = useState<IAccessory[]>([])
+  const [accessoryCategories, setAccessoryCategories] = useState<ICategoryAccessory[]>([])
+  const [filteredAccessories, setFilteredAccessories] = useState<IAccessory[]>([])
   const [sortBy, setSortBy] = useState("best-selling")
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [layout, setLayout] = useState<"grid" | "list">("grid")
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [accRes, catRes] = await Promise.all([
+          fetch("http://localhost:5001/api/accessories"),
+          fetch("http://localhost:5001/api/categoriesaccessory"),
+        ])
+        const accJson = await accRes.json()
+        const catJson = await catRes.json()
+        console.log(accJson, catJson)
+        if (accJson.success) setAccessories(accJson.data)
+        if (catJson.success) setAccessoryCategories(catJson.data)
+      } catch (error) {
+        console.error("Error fetching accessories or categories", error)
+      }
+    }
+    fetchData()
+  }, [])
 
   useEffect(() => {
     let filtered = [...accessories]
@@ -49,7 +70,7 @@ export default function AccessoriesPage() {
     })
 
     setFilteredAccessories(filtered)
-  }, [sortBy, categoryFilter, searchQuery])
+  }, [accessories, sortBy, categoryFilter, searchQuery])
 
   return (
     <>
@@ -141,8 +162,8 @@ export default function AccessoriesPage() {
                     >
                       <option value="">All Categories</option>
                       {accessoryCategories.map((category) => (
-                        <option key={category} value={category}>
-                          {category}
+                        <option key={category._id} value={category.name}>
+                          {category.name}
                         </option>
                       ))}
                     </select>
@@ -179,7 +200,7 @@ export default function AccessoriesPage() {
             }
           >
             {filteredAccessories.map((accessory) => (
-              <AccessoryCard key={accessory.id} accessory={accessory} layout={layout} />
+              <AccessoryCard key={accessory._id} accessory={accessory} layout={layout} />
             ))}
           </div>
 

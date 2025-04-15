@@ -1,15 +1,51 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { products } from "@/data/products"
 import ProductCard from "@/components/ProductCard"
 import { Grid, List, Search } from "lucide-react"
 import DuHeader from "@/components/DuHeader"
 import Footer from "@/components/Footer"
 import Head from "next/head"
+import Link from "next/link"
+
+interface Dimensions {
+  length: number
+  width: number
+  height: number
+  unit: "mm" | "cm" | "in"
+}
+
+export interface Product {
+  _id: string
+  id: string
+  name: string
+  sku: string
+  description: string
+  categories: string[]
+  brand: string
+  color: string
+  modelCode: string
+  scale: string
+  stock: number
+  OutOfStock: boolean
+  price: number
+  slug: string
+  media: {
+    type: "image" | "video" | "instagram"
+    url: string
+    mediaId?: string
+  }[]
+  technicalSpecs: string[]
+  weight: number
+  dimensions: Dimensions
+  discountPercentage?: number
+  finalPrice?: number
+}
 
 export default function ProductsPage() {
-  const [filteredProducts, setFilteredProducts] = useState(products)
+  // New state to hold products fetched from the API
+  const [allProducts, setAllProducts] = useState<Product[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [sortBy, setSortBy] = useState("best-selling")
   const [colorFilter, setColorFilter] = useState<string | null>(null)
   const [scaleFilter, setScaleFilter] = useState<string | null>(null)
@@ -17,17 +53,37 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [layout, setLayout] = useState<"grid" | "list">("grid")
 
-  // Get unique values for filters
-  const uniqueColors = Array.from(new Set(products.map((p) => p.color)))
-  const uniqueScales = Array.from(new Set(products.map((p) => p.scale))).sort((a, b) => {
-    const aNum = Number.parseFloat(a.split(":")[1])
-    const bNum = Number.parseFloat(b.split(":")[1])
+  // Fetch products dynamically from the API on mount
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        const res = await fetch("http://localhost:5001/api/products")
+        const json = await res.json()
+        if (json.success) {
+          // Map each product to add an "id" field (using the _id) for consistency
+          const productsWithId = json.data.map((p: Product) => ({ ...p, id: p._id }))
+          setAllProducts(productsWithId)
+          setFilteredProducts(productsWithId)
+        }
+      } catch (error) {
+        console.error("Error fetching products", error)
+      }
+    }
+    fetchProducts()
+  }, [])
+
+  // Compute unique filter options from the fetched products
+  const uniqueColors = Array.from(new Set(allProducts.map((p) => p.color)))
+  const uniqueScales = Array.from(new Set(allProducts.map((p) => p.scale))).sort((a, b) => {
+    const aNum = Number.parseFloat(a.split(":")[1] || "0")
+    const bNum = Number.parseFloat(b.split(":")[1] || "0")
     return bNum - aNum
   })
-  const uniqueBrands = Array.from(new Set(products.map((p) => p.brand)))
+  const uniqueBrands = Array.from(new Set(allProducts.map((p) => p.brand)))
 
+  // Apply filtering and sorting whenever filters change or new products are fetched
   useEffect(() => {
-    let filtered = [...products]
+    let filtered = [...allProducts]
 
     // Apply search filter
     if (searchQuery) {
@@ -38,7 +94,7 @@ export default function ProductsPage() {
           p.modelCode.toLowerCase().includes(query) ||
           p.brand.toLowerCase().includes(query) ||
           p.scale.toLowerCase().includes(query) ||
-          p.color.toLowerCase().includes(query),
+          p.color.toLowerCase().includes(query)
       )
     }
 
@@ -71,12 +127,12 @@ export default function ProductsPage() {
     })
 
     setFilteredProducts(filtered)
-  }, [sortBy, colorFilter, scaleFilter, brandFilter, searchQuery])
+  }, [sortBy, colorFilter, scaleFilter, brandFilter, searchQuery, allProducts])
 
   return (
     <>
       <Head>
-        <title>RC Products - RC MEGA</title>
+        <title>RC Products - RC MEGA Market</title>
         <meta name="description" content="Browse our collection of high-quality RC vehicles and models." />
         <meta property="og:title" content="RC Products - RC MEGA" />
         <meta
@@ -248,7 +304,7 @@ export default function ProductsPage() {
             }
           >
             {filteredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} layout={layout} />
+              <ProductCard key={product._id} product={product} layout={layout} />
             ))}
           </div>
 
@@ -260,6 +316,28 @@ export default function ProductsPage() {
               </p>
             </div>
           )}
+        </section>
+
+        {/* Top Products Section */}
+        <section className="py-12 md:py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-white">Top RC Products</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredProducts.slice(0, 8).map((product) => (
+                <ProductCard key={product.id} product={product} layout={layout} />
+              ))}
+            </div>
+            <div className="text-center py-8">
+              <Link 
+                href="/products" 
+                className="inline-block px-8 py-4 bg-[#FF6600] text-white rounded-full font-semibold hover:bg-[#E65C00] transition-colors shadow-lg"
+              >
+                View All Products
+              </Link>
+            </div>
+          </div>
         </section>
 
         <Footer />

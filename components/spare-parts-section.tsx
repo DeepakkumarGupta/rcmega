@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import type { SparePart } from "@/data/products"
 import SparePartCard from "@/components/spare-part-card"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import { ISparePart } from "@/types/product"
 
 export default function SparePartsSection({
   spareParts,
   title = "Compatible Spare Parts",
 }: {
-  spareParts: SparePart[]
+  spareParts: ISparePart[]
   title?: string
 }) {
   const [currentPage, setCurrentPage] = useState(0)
@@ -63,7 +63,7 @@ export default function SparePartsSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentSpareParts.map((sparePart) => (
-          <SparePartCard key={sparePart.id} sparePart={sparePart} />
+          <SparePartCard key={sparePart._id} sparePart={sparePart} />
         ))}
       </div>
 

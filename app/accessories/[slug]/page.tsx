@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { FaWhatsapp, FaShare } from "react-icons/fa"
-import { getAccessoryBySlug, getProductById, type Accessory, type Product } from "@/data/products"
 import { Swiper, SwiperSlide } from "swiper/react"
 import type { Swiper as SwiperType } from "swiper"
 import { A11y, Keyboard, Pagination, Thumbs } from "swiper/modules"
@@ -15,27 +14,54 @@ import Footer from "@/components/Footer"
 import DuHeader from "@/components/DuHeader"
 import ProductCard from "@/components/ProductCard"
 import Head from "next/head"
+import { IAccessory, IProduct } from "@/types/product"
 
 export default function AccessoryDetailPage() {
   const params = useParams()
-  const [accessory, setAccessory] = useState<Accessory | null>(null)
-  const [compatibleProducts, setCompatibleProducts] = useState<Product[]>([])
+  const [accessory, setAccessory] = useState<IAccessory | null>(null)
+  const [compatibleProducts, setCompatibleProducts] = useState<IProduct[]>([])
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (params.slug) {
-      const foundAccessory = getAccessoryBySlug(params.slug as string)
-      setAccessory(foundAccessory || null)
+    async function fetchAccessoryAndProducts() {
+      if (!params.slug) return
+      setIsLoading(true)
+      try {
+        // 1. Fetch accessory by slug
+        const res = await fetch(`http://localhost:5001/api/accessories/slug/${params.slug}`)
+        const json = await res.json()
+        if (!json.success || !json.data) {
+          setAccessory(null)
+          setCompatibleProducts([])
+          setIsLoading(false)
+          return
+        }
+        setAccessory(json.data)
 
-      if (foundAccessory) {
-        // Get compatible products
-        const products = foundAccessory.compatibleProductIds
-          .map((id) => getProductById(id))
-          .filter((product): product is Product => product !== undefined)
-        setCompatibleProducts(products)
+        // 2. Fetch compatible products if any
+        if (json.data.compatibleProductIds && json.data.compatibleProductIds.length > 0) {
+          const productPromises = json.data.compatibleProductIds.map((id: string) =>
+            fetch(`http://localhost:5001/api/products/${id}`).then(res => res.json())
+          )
+          const productsJson = await Promise.all(productPromises)
+          const validProducts = productsJson
+            .filter((p) => p.success && p.data)
+            .map((p) => p.data)
+          setCompatibleProducts(validProducts)
+        } else {
+          setCompatibleProducts([])
+        }
+      } catch (error) {
+        setAccessory(null)
+        console.error("Error fetching accessory or compatible products", error)
+        setCompatibleProducts([])
+      } finally {
+        setIsLoading(false)
       }
     }
+    fetchAccessoryAndProducts()
   }, [params.slug])
 
   const handleShare = () => {
@@ -59,6 +85,16 @@ export default function AccessoryDetailPage() {
       setShowShareTooltip(true)
       setTimeout(() => setShowShareTooltip(false), 2000)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
+        <div className="text-center p-8 max-w-2xl">
+          <h1 className="text-3xl font-bold text-white mb-4">Loading...</h1>
+        </div>
+      </div>
+    )
   }
 
   if (!accessory) {
@@ -104,7 +140,7 @@ export default function AccessoryDetailPage() {
         <meta name="description" content={`${accessory.description} High-quality RC accessory available at RC MEGA.`} />
         <meta property="og:title" content={`${accessory.name} - RC MEGA Accessories`} />
         <meta property="og:description" content={`${accessory.description} Premium RC accessory from RC MEGA.`} />
-        <meta property="og:image" content={accessory.media[0].url} />
+        <meta property="og:image" content={accessory.media[0]?.url} />
         <meta property="og:type" content="product" />
         <meta property="og:price:amount" content={accessory.price.toString()} />
         <meta property="og:price:currency" content="INR" />
@@ -362,7 +398,7 @@ export default function AccessoryDetailPage() {
               <h2 className="text-2xl font-bold text-white mb-6">Compatible Products</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {compatibleProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} layout="grid" />
+                  <ProductCard key={product._id} product={product} layout="grid" />
                 ))}
               </div>
             </section>

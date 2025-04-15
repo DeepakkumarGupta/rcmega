@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { FaWhatsapp, FaShare } from "react-icons/fa"
-import { getSparePartBySlug, getProductById, type SparePart, type Product } from "@/data/products"
 import { Swiper, SwiperSlide } from "swiper/react"
 import type { Swiper as SwiperType } from "swiper"
 import { A11y, Keyboard, Pagination, Thumbs } from "swiper/modules"
@@ -15,27 +14,49 @@ import Footer from "@/components/Footer"
 import DuHeader from "@/components/DuHeader"
 import ProductCard from "@/components/ProductCard"
 import Head from "next/head"
+import { ISparePart, IProduct } from "@/types/product"
 
 export default function SparePartDetailPage() {
   const params = useParams()
-  const [sparePart, setSparePart] = useState<SparePart | null>(null)
-  const [compatibleProducts, setCompatibleProducts] = useState<Product[]>([])
+  const [sparePart, setSparePart] = useState<ISparePart | null>(null)
+  const [compatibleProducts, setCompatibleProducts] = useState<IProduct[]>([])
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
 
   useEffect(() => {
-    if (params.slug) {
-      const foundSparePart = getSparePartBySlug(params.slug as string)
-      setSparePart(foundSparePart || null)
+    async function fetchSparePartAndProducts() {
+      if (!params.slug) return
+      try {
+        // 1. Fetch spare part by slug
+        const res = await fetch(`http://localhost:5001/api/spare-parts/slug/${params.slug}`)
+        const json = await res.json()
+        if (!json.success || !json.data) {
+          setSparePart(null)
+          setCompatibleProducts([])
+          return
+        }
+        setSparePart(json.data)
 
-      if (foundSparePart) {
-        // Get compatible products
-        const products = foundSparePart.compatibleProductIds
-          .map((id) => getProductById(id))
-          .filter((product): product is Product => product !== undefined)
-        setCompatibleProducts(products)
+        // 2. Fetch compatible products if any
+        if (json.data.compatibleProductIds && json.data.compatibleProductIds.length > 0) {
+          const productPromises = json.data.compatibleProductIds.map((id: string) =>
+            fetch(`http://localhost:5001/api/products/${id}`).then(res => res.json())
+          )
+          const productsJson = await Promise.all(productPromises)
+          const validProducts = productsJson
+            .filter((p) => p.success && p.data)
+            .map((p) => p.data)
+          setCompatibleProducts(validProducts)
+        } else {
+          setCompatibleProducts([])
+        }
+      } catch (error) {
+        console.error("Error fetching spare part or compatible products", error)
+        setSparePart(null)
+        setCompatibleProducts([])
       }
     }
+    fetchSparePartAndProducts()
   }, [params.slug])
 
   const handleShare = () => {
@@ -361,11 +382,11 @@ export default function SparePartDetailPage() {
 
           {/* Compatible Products Section */}
           {compatibleProducts.length > 0 && (
-            <section className="mt-12">
+            <section className="mt-12 mb-12">
               <h2 className="text-2xl font-bold text-white mb-6">Compatible Products</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {compatibleProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} layout="grid" />
+                  <ProductCard key={product._id} product={product} layout="grid" />
                 ))}
               </div>
             </section>

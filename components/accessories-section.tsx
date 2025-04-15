@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import type { Accessory } from "@/data/products"
 import AccessoryCard from "@/components/accessory-card"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import Link from "next/link"
+import { IAccessory } from "@/types/product"
 
 export default function AccessoriesSection({
   accessories,
   title = "Compatible Accessories",
 }: {
-  accessories: Accessory[]
+  accessories: IAccessory[]
   title?: string
 }) {
   const [currentPage, setCurrentPage] = useState(0)
@@ -63,7 +63,7 @@ export default function AccessoriesSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentAccessories.map((accessory) => (
-          <AccessoryCard key={accessory.id} accessory={accessory} />
+          <AccessoryCard key={accessory._id} accessory={accessory} />
         ))}
       </div>
 

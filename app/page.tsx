@@ -9,20 +9,42 @@ import { Suspense } from 'react'
 import Loading from '@/components/Loading'
 import Footer from "@/components/Footer"
 import Header from "@/components/Header"
-import { accessories, products, spareParts } from "@/data/products"
 import AccessoryCard from "@/components/accessory-card"
 import SparePartCard from "@/components/spare-part-card"
-import ProductCard from "@/components/ProductCard"
+import { IAccessory, ISparePart } from "@/types/product"
+// import ProductCard from "@/components/ProductCard"
 
 export default function Home() {
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState("")
+  const [accessories, setAccessories] = useState<IAccessory[]>([])
+  const [spareParts, setSpareParts] = useState<ISparePart[]>([])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [accRes, spRes] = await Promise.all([
+          fetch("http://localhost:5001/api/accessories"),
+          fetch("http://localhost:5001/api/spare-parts"),
+        ])
+        const accJson = await accRes.json()
+        const spJson = await spRes.json()
+        
+        if (accJson.success) setAccessories(accJson.data)
+        if (spJson.success) setSpareParts(spJson.data)
+          
+      } catch (error) {
+        console.error("Error fetching accessories or spare parts", error)
+      }
+    }
+    fetchData()
+  }, [])
 
   // Get featured accessories and spare parts (first 4 of each)
   const featuredAccessories = accessories.slice(0, 4)
   const featuredSpareParts = spareParts.slice(0, 4)
-  const featuredProducts = products.slice(0,8)
+  // const featuredProducts = products.slice(0,8)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -160,7 +182,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredAccessories.map((accessory) => (
-              <AccessoryCard key={accessory.id} accessory={accessory} />
+              <AccessoryCard key={accessory._id} accessory={accessory} />
             ))}
           </div>
           
@@ -189,7 +211,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredSpareParts.map((sparePart) => (
-              <SparePartCard key={sparePart.id} sparePart={sparePart} />
+              <SparePartCard key={sparePart._id} sparePart={sparePart} />
             ))}
           </div>
           

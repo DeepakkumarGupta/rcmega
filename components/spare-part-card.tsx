@@ -3,13 +3,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import { FaWhatsapp } from "react-icons/fa6"
-import type { SparePart } from "@/data/products"
+import { ISparePart } from "@/types/product"
 
 export default function SparePartCard({
   sparePart,
   layout = "grid",
 }: {
-  sparePart: SparePart
+  sparePart: ISparePart
   layout?: "grid" | "list"
 }) {
   const whatsappMessage = `Hi! I'm interested in the spare part: ${sparePart.name} (${sparePart.sku}). Price: ₹${sparePart.price.toLocaleString()}. Can you provide more details?`
