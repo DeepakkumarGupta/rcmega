@@ -1,12 +1,12 @@
 "use client"
 import React from 'react'
 import Footer from '@/components/Footer'
-import DuHeader from '@/components/DuHeader'
+import Header from "@/components/Header"
 
 export default function PrivacyPolicy() {
   return (
     <>
-      <DuHeader />
+      <Header />
       <main className="bg-gray-100 min-h-screen py-12">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-[#1B1F3B] mb-8">Privacy Policy</h1>

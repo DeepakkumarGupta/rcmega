@@ -2,8 +2,10 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa6"
 import { ISparePart } from "@/types/product"
+import { getBrands } from "@/lib/api"
 
 export default function SparePartCard({
   sparePart,
@@ -12,6 +14,16 @@ export default function SparePartCard({
   sparePart: ISparePart
   layout?: "grid" | "list"
 }) {
+  const [brands, setBrands] = useState<any[]>([])
+  useEffect(() => {
+    getBrands().then((data) => setBrands(data || []))
+  }, [])
+
+  // Find the brand object for this spare part
+  const brandObj = brands.find(
+    (b) => b._id === sparePart.brand || b.name === sparePart.brand
+  )
+
   const whatsappMessage = `Hi! I'm interested in the spare part: ${sparePart.name} (${sparePart.sku}). Price: ₹${sparePart.price.toLocaleString()}. Can you provide more details?`
 
   return (
@@ -44,7 +56,14 @@ export default function SparePartCard({
 
           {/* Brand Badge */}
           <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full flex items-center gap-1 text-xs">
-            {sparePart.brand}
+            <Image
+              src={brandObj?.logo || "/placeholder.svg"}
+              alt={brandObj?.name || sparePart.brand}
+              width={16}
+              height={16}
+              className="h-4 w-4 object-contain"
+            />
+            {brandObj?.name || sparePart.brand}
           </div>
         </div>
       </Link>

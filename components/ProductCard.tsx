@@ -1,24 +1,50 @@
 "use client"
 import Image from "next/image"
 import Link from "next/link"
-import { brandLogos, type Product } from "@/data/products"
+import { getBrands } from "@/lib/api"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/pagination"
 import { FaWhatsapp } from "react-icons/fa6"
+import { IProduct } from "@/types/product"
+import { useEffect, useState } from "react"
 
 export default function ProductCard({
   product,
   layout,
 }: {
-  product: Product
+  product: IProduct
   layout: "grid" | "list"
 }) {
   const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Can you provide more details.?`
 
+  // Store brands as an array
+  const [brands, setBrands] = useState<any[]>([])
+
   // Filter only the first 3 images from the media array
   const productImages = product.media.filter((media) => media.type === "image").slice(0, 3)
+  
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const data = await getBrands()
+        
+        setBrands(data)
+        console.log("Brands fetched:", data)
+      } catch (error) {
+        console.error("Error fetching brand logos:", error)
+      }
+    }
+
+    fetchBrands()
+    console.log("Brand logos fetched:", brands)
+  }, [])
+
+  // Find the brand object for this product
+  const brandObj = brands.find(
+    (b) =>  b.name === product.brand
+  )
 
   return (
     <div
@@ -56,13 +82,13 @@ export default function ProductCard({
           {/* Brand Badge */}
           <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full flex items-center gap-1 text-xs">
             <Image
-              src={brandLogos[product.brand] || "/placeholder.svg"}
-              alt={product.brand}
+              src={brandObj?.logo || "/placeholder.svg"}
+              alt={brandObj?.name || product.brand}
               width={16}
               height={16}
               className="h-4 w-4 object-contain"
             />
-            {product.brand}
+            {brandObj?.name || product.brand}
           </div>
         </div>
       </Link>

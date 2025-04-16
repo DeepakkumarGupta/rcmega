@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import ProductCard from "@/components/ProductCard"
 import Link from "next/link"
 import { IProduct } from "@/types/product"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function TopProductsSection() {
   const [products, setProducts] = useState<IProduct[]>([])
@@ -12,7 +13,7 @@ export default function TopProductsSection() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch("http://localhost:5001/api/products")
+        const res = await fetch(`${API_BASE_URL}/products`)
         const json = await res.json()
         if(json.success){
           // The API response data is wrapped inside the "data" key

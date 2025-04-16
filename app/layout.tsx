@@ -110,7 +110,7 @@ export default function RootLayout({
           />
         </header>
         <main>{children}</main>
-        <footer>{/* Add footer content */}</footer>
+        <footer></footer>
       </body>
     </html>
   )

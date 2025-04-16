@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react"
 import SparePartCard from "@/components/spare-part-card"
 import { Grid, List, Search } from "lucide-react"
-import DuHeader from "@/components/DuHeader"
+import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
 import { ISparePart } from "@/types/product"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function SparePartsPage() {
   const [spareParts, setSpareParts] = useState<ISparePart[]>([])
@@ -21,8 +22,8 @@ export default function SparePartsPage() {
     async function fetchData() {
       try {
         const [spRes, catRes] = await Promise.all([
-          fetch("http://localhost:5001/api/spare-parts"),
-          fetch("http://localhost:5001/api/categoriessparepart"),
+          fetch(`${API_BASE_URL}/spare-parts`),
+          fetch(`${API_BASE_URL}/categoriessparepart`),
         ])
         const spJson = await spRes.json()
         const catJson = await catRes.json()
@@ -81,7 +82,7 @@ export default function SparePartsPage() {
         <link rel="canonical" href="https://www.rcmega.com/spare-parts" />
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
-        <DuHeader />
+        <Header />
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <header className="flex flex-col gap-6 mb-8">

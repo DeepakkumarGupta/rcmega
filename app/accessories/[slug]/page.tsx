@@ -11,10 +11,11 @@ import { A11y, Keyboard, Pagination, Thumbs } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/pagination"
 import Footer from "@/components/Footer"
-import DuHeader from "@/components/DuHeader"
+import Header from "@/components/Header"
 import ProductCard from "@/components/ProductCard"
 import Head from "next/head"
 import { IAccessory, IProduct } from "@/types/product"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 
 export default function AccessoryDetailPage() {
   const params = useParams()
@@ -23,6 +24,11 @@ export default function AccessoryDetailPage() {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [brands, setBrands] = useState<any[]>([])
+
+  useEffect(() => {
+    getBrands().then((data) => setBrands(data || []))
+  }, [])
 
   useEffect(() => {
     async function fetchAccessoryAndProducts() {
@@ -30,7 +36,7 @@ export default function AccessoryDetailPage() {
       setIsLoading(true)
       try {
         // 1. Fetch accessory by slug
-        const res = await fetch(`http://localhost:5001/api/accessories/slug/${params.slug}`)
+        const res = await fetch(`${API_BASE_URL}/accessories/slug/${params.slug}`)
         const json = await res.json()
         if (!json.success || !json.data) {
           setAccessory(null)
@@ -43,7 +49,7 @@ export default function AccessoryDetailPage() {
         // 2. Fetch compatible products if any
         if (json.data.compatibleProductIds && json.data.compatibleProductIds.length > 0) {
           const productPromises = json.data.compatibleProductIds.map((id: string) =>
-            fetch(`http://localhost:5001/api/products/${id}`).then(res => res.json())
+            fetch(`${API_BASE_URL}/products/${id}`).then(res => res.json())
           )
           const productsJson = await Promise.all(productPromises)
           const validProducts = productsJson
@@ -133,6 +139,11 @@ export default function AccessoryDetailPage() {
   const whatsappMessage = `Hi! I'm interested in the accessory: ${accessory.name} (${accessory.sku}). Price: ₹${accessory.price.toLocaleString()}. Please provide more details.`
   const notifyMessage = `Hi! I'm interested in the accessory: ${accessory.name} (${accessory.sku}). Please notify me when it's back in stock.`
 
+  // Find the brand object for this accessory
+  const brandObj = brands.find(
+    (b) => b._id === accessory?.brand || b.name === accessory?.brand
+  )
+
   return (
     <>
       <Head>
@@ -148,7 +159,7 @@ export default function AccessoryDetailPage() {
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-        <DuHeader />
+        <Header />
 
         {/* Breadcrumb and Action Buttons */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-12">
@@ -279,9 +290,15 @@ export default function AccessoryDetailPage() {
               <section aria-labelledby="accessory-details" className="p-6 md:p-8 lg:p-10">
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                    <span className="text-sm text-white font-medium">{accessory.brand}</span>
+                    <Image
+                      src={brandObj?.logo || "/placeholder.svg"}
+                      alt={brandObj?.name || accessory.brand}
+                      width={24}
+                      height={24}
+                      className="h-6 w-6 object-contain"
+                    />
+                    <span className="text-sm text-white font-medium">{brandObj?.name || accessory.brand}</span>
                   </div>
-
                   {accessory.outOfStock ? (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">
                       Out of Stock

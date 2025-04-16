@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react"
 import AccessoryCard from "@/components/accessory-card"
 import { Grid, List, Search } from "lucide-react"
-import DuHeader from "@/components/DuHeader"
+import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
 import { IAccessory, ICategoryAccessory } from "@/types/product"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function AccessoriesPage() {
   const [accessories, setAccessories] = useState<IAccessory[]>([])
@@ -21,8 +22,8 @@ export default function AccessoriesPage() {
     async function fetchData() {
       try {
         const [accRes, catRes] = await Promise.all([
-          fetch("http://localhost:5001/api/accessories"),
-          fetch("http://localhost:5001/api/categoriesaccessory"),
+          fetch(`${API_BASE_URL}/accessories`),
+          fetch(`${API_BASE_URL}/categoriesaccessory`),
         ])
         const accJson = await accRes.json()
         const catJson = await catRes.json()
@@ -89,7 +90,7 @@ export default function AccessoriesPage() {
         <link rel="canonical" href="https://www.rcmega.com/accessories" />
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
-        <DuHeader />
+        <Header />
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <header className="flex flex-col gap-6 mb-8">

@@ -73,3 +73,9 @@ export interface ICategoryAccessory {
     name: string
     logo: string
   }
+
+export interface IBrand {
+    _id: string;
+    name: string;
+    logo: string;
+}

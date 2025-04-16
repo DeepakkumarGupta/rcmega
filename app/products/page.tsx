@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react"
 import ProductCard from "@/components/ProductCard"
 import { Grid, List, Search } from "lucide-react"
-import DuHeader from "@/components/DuHeader"
+import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
 import Link from "next/link"
-
+import { API_BASE_URL } from "@/lib/api"
 interface Dimensions {
   length: number
   width: number
@@ -57,7 +57,7 @@ export default function ProductsPage() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const res = await fetch("http://localhost:5001/api/products")
+        const res = await fetch(`${API_BASE_URL}/products`)
         const json = await res.json()
         if (json.success) {
           // Map each product to add an "id" field (using the _id) for consistency
@@ -143,7 +143,7 @@ export default function ProductsPage() {
         <link rel="canonical" href="https://www.rcmega.com/products" />
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
-        <DuHeader />
+        <Header />
 
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <header className="flex flex-col gap-6 mb-8">
@@ -318,27 +318,6 @@ export default function ProductsPage() {
           )}
         </section>
 
-        {/* Top Products Section */}
-        <section className="py-12 md:py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-white">Top RC Products</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.slice(0, 8).map((product) => (
-                <ProductCard key={product.id} product={product} layout={layout} />
-              ))}
-            </div>
-            <div className="text-center py-8">
-              <Link 
-                href="/products" 
-                className="inline-block px-8 py-4 bg-[#FF6600] text-white rounded-full font-semibold hover:bg-[#E65C00] transition-colors shadow-lg"
-              >
-                View All Products
-              </Link>
-            </div>
-          </div>
-        </section>
 
         <Footer />
       </div>

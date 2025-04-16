@@ -1,4 +1,4 @@
-import { ISparePart } from "@/types/product";
+
 
 export interface Accessory {
   slug: string;
@@ -1061,7 +1061,7 @@ export const products: Product[] = [
 
 
 // Create sample spare parts data with product _id references
-export const spareParts: ISparePart[] = [
+export const spareParts: SparePart[] = [
   {
     _id: "sp001",
     slug: "fms-hummer-h1-wheel-set",
@@ -1624,13 +1624,13 @@ export function getCompleteProductInfo(product_id: string): ProductWithAccessori
 }
 
 // Function to get spare parts for a specific product by product _id
-export function getSparePartsForProduct(product_id: string): ISparePart[] {
+export function getSparePartsForProduct(product_id: string): SparePart[] {
   return spareParts.filter(part => part.compatibleProductIds.includes(product_id));
 }
 
 // Example of how to extend the Product interface to include spare parts
 export interface ProductWithSpareParts extends Product {
-  compatibleSpareParts?: ISparePart[];
+  compatibleSpareParts?: SparePart[];
 }
 
 // Function to enrich products with their compatible spare parts
@@ -1648,7 +1648,7 @@ export function getProductBy_id(product_id: string): Product | undefined {
 
 
 // Get spare part by _id
-export function getSparePartBy_id(sparePart_id: string): ISparePart | undefined {
+export function getSparePartBy_id(sparePart_id: string): SparePart | undefined {
   return spareParts.find(part => part._id === sparePart_id);
 }
 
@@ -1660,7 +1660,7 @@ export const sparePartCategories = Array.from(
 
 
 // Get spare part by slug
-export function getSparePartBySlug(sparePartSlug: string): ISparePart | undefined {
+export function getSparePartBySlug(sparePartSlug: string): SparePart | undefined {
   return spareParts.find((part) => part.slug === sparePartSlug)
 }
 

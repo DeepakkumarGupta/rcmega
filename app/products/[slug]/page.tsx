@@ -12,12 +12,12 @@ import "swiper/css"
 import "swiper/css/pagination"
 import Footer from "@/components/Footer"
 import { useVideoAutoplay } from "@/components/hooks/useVideoAutoply"
-import DuHeader from "@/components/DuHeader"
+import Header from "@/components/Header"
 import Head from "next/head"
 import AccessoriesSection from "@/components/accessories-section"
 import SparePartsSection from "@/components/spare-parts-section"
-import { brandLogos as BrandLogos } from "@/data/products"
 import { IAccessory, ISparePart, IDimensions, IMedia } from "@/types/product"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 
 // Define interfaces
 export interface Product {
@@ -53,16 +53,22 @@ export interface Product {
 export default function ProductPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
+  const [brands, setBrands] = useState<any[]>([]) // <-- Add this line
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
   const videoRef = useVideoAutoplay()
+
+  // Fetch brands on mount
+  useEffect(() => {
+    getBrands().then((data) => setBrands(data || []))
+  }, [])
 
   useEffect(() => {
     async function fetchProduct() {
       if (params.slug) {
         try { 
           // Fetch product by slug
-          const resSlug = await fetch(`http://localhost:5001/api/products/slug/${params.slug}`)
+          const resSlug = await fetch(`${API_BASE_URL}/products/slug/${params.slug}`)
           const slugResponse = await resSlug.json()
           let productData = null
           
@@ -82,7 +88,7 @@ export default function ProductPage() {
             productData = { ...productData, id: productId }
 
             // Fetch complete product info (with spare parts and accessories)
-            const resComplete = await fetch(`http://localhost:5001/api/products/${productId}/complete`)
+            const resComplete = await fetch(`${API_BASE_URL}/products/${productId}/complete`)
             const completeResponse = await resComplete.json()
             if (completeResponse.success && completeResponse.data) {
               setProduct(completeResponse.data)
@@ -158,6 +164,11 @@ export default function ProductPage() {
   const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Please provide more details.`
   const notifyMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Please notify me when it's back in stock.`
 
+  // Find the brand object for this product
+  const brandObj = brands.find(
+    (b) => b._id === product?.brand || b.name === product?.brand
+  )
+
   return (
     <>
       <Head>
@@ -179,7 +190,7 @@ export default function ProductPage() {
       </Head>
       <div className="min-h-screen bg-gradient-to-b from-[#1B1F3B] to-[#2A305E]">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-        <DuHeader />
+        <Header />
 
         {/* Breadcrumb and Action Buttons */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-12">
@@ -325,11 +336,11 @@ export default function ProductPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                     <Image
-                      src={BrandLogos[product.brand] || "/placeholder.svg"}
-                      alt={`${product.brand} logo`}
+                      src={brandObj?.logo || "/placeholder.svg"}
+                      alt={brandObj?.name || product.brand}
                       width={24} height={24} className="h-6 w-6 object-contain"
                     />
-                    <span className="text-sm text-white font-medium">{product.brand}</span>
+                    <span className="text-sm text-white font-medium">{brandObj?.name || product.brand}</span>
                   </div>
                   {product.OutOfStock ? (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-600/20 text-red-400">

@@ -5,6 +5,8 @@ import React from "react";
 
 const Footer = () => {
   return (
+    <>
+   
     <footer className="relative bg-[#FF6600] text-white pt-20">
       {/* SVG Separator */}
       <div
@@ -132,6 +134,7 @@ const Footer = () => {
         </div>
       </div>
     </footer>
+    </>
   );
 };
 
