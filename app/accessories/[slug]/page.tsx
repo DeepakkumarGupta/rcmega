@@ -24,42 +24,11 @@ export default function AccessoryDetailPage() {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [brands, setBrands] = useState<IBrand[]>([ {
-    "_id": "67ded219121c68b181686ea2",
-    "name": "FMS",
-    "logo": "https://www.rcmega.com/products/Brand/FMS/logo/fmslogo.svg",
-  
-  },
-  {
-    "_id": "67ded516121c68b181686ebd",
-    "name": "Injora",
-    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/5ae41237-c3f0-485a-8458-4b1d625da214.webp",
-  
-   
-  },
-  {
-    "_id": "67dbad66121c68b1816868be",
-    "name": "MJX Hyper Go",
-    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/a81d77cb-d423-4ef0-9607-678b07b7c388.webp",
-   
-   
-  },
-  {
-    "_id": "67dbb31d121c68b1816868f4",
-    "name": "MNRC",
-    "logo": "https://www.rcmega.com/_next/image?url=%2Fproducts%2FBrand%2FMNRC%2Flogo%2FMN-Logo.png&w=128&q=75",
-   
-  },
-  {
-    "_id": "67dbbf06121c68b1816869ea",
-    "name": "Rlaarlo",
-    "logo": "https://yt3.googleusercontent.com/dcAw6qukKL9C1ee-qyft8r6hUeOfSHiI6XYiUBQ-z98Crqs9d3-F1IZIehwD9xTjP5x5V7j5Sw=s900-c-k-c0x00ffffff-no-rj",
-    
-  }])
+  const [brands, setBrands] = useState<IBrand[]>([])
 
-  // useEffect(() => {
-  //   getBrands().then((data) => setBrands(data || []))
-  // }, [])
+  useEffect(() => {
+    getBrands().then((data) => setBrands(data || []))
+  }, [])
 
   useEffect(() => {
     async function fetchAccessoryAndProducts() {
