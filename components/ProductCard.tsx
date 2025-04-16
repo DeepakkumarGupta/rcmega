@@ -7,7 +7,7 @@ import { Pagination } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/pagination"
 import { FaWhatsapp } from "react-icons/fa6"
-import { IProduct } from "@/types/product"
+import { IBrand, IProduct } from "@/types/product"
 import { useEffect, useState } from "react"
 
 export default function ProductCard({
@@ -20,26 +20,57 @@ export default function ProductCard({
   const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Can you provide more details.?`
 
   // Store brands as an array
-  const [brands, setBrands] = useState<any[]>([])
+  const [brands, setBrands] = useState<IBrand[]>([
+    {
+      "_id": "67ded219121c68b181686ea2",
+      "name": "FMS",
+      "logo": "https://www.rcmega.com/products/Brand/FMS/logo/fmslogo.svg",
+    
+    },
+    {
+      "_id": "67ded516121c68b181686ebd",
+      "name": "Injora",
+      "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/5ae41237-c3f0-485a-8458-4b1d625da214.webp",
+    
+     
+    },
+    {
+      "_id": "67dbad66121c68b1816868be",
+      "name": "MJX Hyper Go",
+      "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/a81d77cb-d423-4ef0-9607-678b07b7c388.webp",
+     
+     
+    },
+    {
+      "_id": "67dbb31d121c68b1816868f4",
+      "name": "MNRC",
+      "logo": "https://www.rcmega.com/_next/image?url=%2Fproducts%2FBrand%2FMNRC%2Flogo%2FMN-Logo.png&w=128&q=75",
+     
+    },
+    {
+      "_id": "67dbbf06121c68b1816869ea",
+      "name": "Rlaarlo",
+      "logo": "https://yt3.googleusercontent.com/dcAw6qukKL9C1ee-qyft8r6hUeOfSHiI6XYiUBQ-z98Crqs9d3-F1IZIehwD9xTjP5x5V7j5Sw=s900-c-k-c0x00ffffff-no-rj",
+      
+    }
+  ])
 
   // Filter only the first 3 images from the media array
   const productImages = product.media.filter((media) => media.type === "image").slice(0, 3)
   
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const data = await getBrands()
+  // useEffect(() => {
+  //   const fetchBrands = async () => {
+  //     try {
+  //       const data = await getBrands()
         
-        setBrands(data)
-        console.log("Brands fetched:", data)
-      } catch (error) {
-        console.error("Error fetching brand logos:", error)
-      }
-    }
-
-    fetchBrands()
-    console.log("Brand logos fetched:", brands)
-  }, [])
+  //       setBrands(data)
+      
+  //     } catch (error) {
+  //       console.error("Error fetching brand logos:", error)
+  //     }
+  //   }
+  //   fetchBrands()
+  // }, [])
 
   // Find the brand object for this product
   const brandObj = brands.find(
@@ -63,7 +94,7 @@ export default function ProductCard({
             {productImages.map((media, index) => (
               <SwiperSlide key={index}>
                 <Image
-                  src={media.url || "/placeholder.svg"}
+                  src={media.url || "/rcmegalogo.png"}
                   alt={`${product.name} - Image ${index + 1}`}
                   fill
                   className="object-cover"

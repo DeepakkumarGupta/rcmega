@@ -6,7 +6,6 @@ import { Grid, List, Search } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
-import Link from "next/link"
 import { API_BASE_URL } from "@/lib/api"
 interface Dimensions {
   length: number

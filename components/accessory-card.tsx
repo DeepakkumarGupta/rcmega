@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa6"
-import { IAccessory } from "@/types/product"
+import { IAccessory, IBrand } from "@/types/product"
 import { getBrands } from "@/lib/api"
 
 export default function AccessoryCard({
@@ -14,10 +14,41 @@ export default function AccessoryCard({
   accessory: IAccessory
   layout?: "grid" | "list"
 }) {
-  const [brands, setBrands] = useState<any[]>([])
-  useEffect(() => {
-    getBrands().then((data) => setBrands(data || []))
-  }, [])
+  const [brands, setBrands] = useState<IBrand[]>([ {
+    "_id": "67ded219121c68b181686ea2",
+    "name": "FMS",
+    "logo": "https://www.rcmega.com/products/Brand/FMS/logo/fmslogo.svg",
+  
+  },
+  {
+    "_id": "67ded516121c68b181686ebd",
+    "name": "Injora",
+    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/5ae41237-c3f0-485a-8458-4b1d625da214.webp",
+  
+   
+  },
+  {
+    "_id": "67dbad66121c68b1816868be",
+    "name": "MJX Hyper Go",
+    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/a81d77cb-d423-4ef0-9607-678b07b7c388.webp",
+   
+   
+  },
+  {
+    "_id": "67dbb31d121c68b1816868f4",
+    "name": "MNRC",
+    "logo": "https://www.rcmega.com/_next/image?url=%2Fproducts%2FBrand%2FMNRC%2Flogo%2FMN-Logo.png&w=128&q=75",
+   
+  },
+  {
+    "_id": "67dbbf06121c68b1816869ea",
+    "name": "Rlaarlo",
+    "logo": "https://yt3.googleusercontent.com/dcAw6qukKL9C1ee-qyft8r6hUeOfSHiI6XYiUBQ-z98Crqs9d3-F1IZIehwD9xTjP5x5V7j5Sw=s900-c-k-c0x00ffffff-no-rj",
+    
+  }])
+  // useEffect(() => {
+  //   getBrands().then((data) => setBrands(data || []))
+  // }, [])
 
   // Find the brand object for this accessory
   const brandObj = brands.find(
@@ -39,7 +70,7 @@ export default function AccessoryCard({
       >
         <div className="relative aspect-square rounded-xl overflow-hidden">
           <Image
-            src={accessory.media[0]?.url || "/placeholder.svg"}
+            src={accessory.media[0]?.url || "/rcmegalogo.png"}
             alt={accessory.name}
             fill
             className="object-cover"
@@ -57,7 +88,7 @@ export default function AccessoryCard({
           {/* Brand Badge */}
           <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full flex items-center gap-1 text-xs">
             <Image
-              src={brandObj?.logo || "/placeholder.svg"}
+              src={brandObj?.logo || "/rcmegalogo.png"}
               alt={brandObj?.name || accessory.brand}
               width={16}
               height={16}

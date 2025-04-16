@@ -16,7 +16,7 @@ import Header from "@/components/Header"
 import Head from "next/head"
 import AccessoriesSection from "@/components/accessories-section"
 import SparePartsSection from "@/components/spare-parts-section"
-import { IAccessory, ISparePart, IDimensions, IMedia } from "@/types/product"
+import { IAccessory, ISparePart, IDimensions, IMedia, IBrand } from "@/types/product"
 import { API_BASE_URL, getBrands } from "@/lib/api"
 
 // Define interfaces
@@ -53,15 +53,46 @@ export interface Product {
 export default function ProductPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
-  const [brands, setBrands] = useState<any[]>([]) // <-- Add this line
+  const [brands, setBrands] = useState<IBrand[]>([ {
+    "_id": "67ded219121c68b181686ea2",
+    "name": "FMS",
+    "logo": "https://www.rcmega.com/products/Brand/FMS/logo/fmslogo.svg",
+  
+  },
+  {
+    "_id": "67ded516121c68b181686ebd",
+    "name": "Injora",
+    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/5ae41237-c3f0-485a-8458-4b1d625da214.webp",
+  
+   
+  },
+  {
+    "_id": "67dbad66121c68b1816868be",
+    "name": "MJX Hyper Go",
+    "logo": "https://mediavault.clicktrick.in/uploads/67ed0d1fdf9d52317774d34e/images/optimized/a81d77cb-d423-4ef0-9607-678b07b7c388.webp",
+   
+   
+  },
+  {
+    "_id": "67dbb31d121c68b1816868f4",
+    "name": "MNRC",
+    "logo": "https://www.rcmega.com/_next/image?url=%2Fproducts%2FBrand%2FMNRC%2Flogo%2FMN-Logo.png&w=128&q=75",
+   
+  },
+  {
+    "_id": "67dbbf06121c68b1816869ea",
+    "name": "Rlaarlo",
+    "logo": "https://yt3.googleusercontent.com/dcAw6qukKL9C1ee-qyft8r6hUeOfSHiI6XYiUBQ-z98Crqs9d3-F1IZIehwD9xTjP5x5V7j5Sw=s900-c-k-c0x00ffffff-no-rj",
+    
+  }]) // <-- Add this line
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
   const [showShareTooltip, setShowShareTooltip] = useState(false)
   const videoRef = useVideoAutoplay()
 
   // Fetch brands on mount
-  useEffect(() => {
-    getBrands().then((data) => setBrands(data || []))
-  }, [])
+  // useEffect(() => {
+  //   getBrands().then((data) => setBrands(data || []))
+  // }, [])
 
   useEffect(() => {
     async function fetchProduct() {
@@ -286,7 +317,7 @@ export default function ProductPage() {
                           </div>
                         ) : (
                           <Image
-                            src={media.url || "/placeholder.svg"}
+                            src={media.url || "/rcmegalogo.png"}
                             alt={`${product.name} - Detailed view ${index + 1}`}
                             fill className="object-contain"
                             sizes="(max-width: 1024px) 100vw, 50vw" priority={index === 0}
@@ -309,7 +340,7 @@ export default function ProductPage() {
                         <div className="relative aspect-square border-2 border-transparent rounded-lg overflow-hidden transition-all hover:border-yellow-500 group">
                           {media.type === "image" ? (
                             <Image
-                              src={media.url || "/placeholder.svg"}
+                              src={media.url || "/rcmegalogo.png"}
                               alt={`Thumbnail view of ${product.name} - ${index + 1}`}
                               fill className="object-cover"
                               sizes="(max-width: 640px) 25vw, 150px" loading="lazy"
@@ -336,9 +367,9 @@ export default function ProductPage() {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
                     <Image
-                      src={brandObj?.logo || "/placeholder.svg"}
+                      src={brandObj?.logo || "/rcmegalogo.png"} 
                       alt={brandObj?.name || product.brand}
-                      width={24} height={24} className="h-6 w-6 object-contain"
+                      width={24} height={24} className="h-6 w-6 object-contain" 
                     />
                     <span className="text-sm text-white font-medium">{brandObj?.name || product.brand}</span>
                   </div>
