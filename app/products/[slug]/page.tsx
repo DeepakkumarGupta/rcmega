@@ -461,7 +461,7 @@ export default function ProductPage() {
           {product.compatibleAccessories && product.compatibleAccessories.length > 0 && (
             <div className="mt-10">
               <AccessoriesSection accessories={product.compatibleAccessories}
-                title={`Compatible Accessories for ${product.name}`} />
+                title={`Compatible Accessories for ${product.name}`} brands={brands} />
             </div>
           )}
 
@@ -469,7 +469,7 @@ export default function ProductPage() {
           {product.compatibleSpareParts && product.compatibleSpareParts.length > 0 && (
             <div className="mt-10">
               <SparePartsSection spareParts={product.compatibleSpareParts}
-                title={`Compatible Spare Parts for ${product.name}`} />
+                title={`Compatible Spare Parts for ${product.name}`} brands={brands}/>
             </div>
           )}
         </main>

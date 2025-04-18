@@ -9,13 +9,14 @@ import Footer from "@/components/Footer"
 import Header from "@/components/Header"
 import AccessoryCard from "@/components/accessory-card"
 import SparePartCard from "@/components/spare-part-card"
-import { IAccessory, ISparePart } from "@/types/product"
-import { API_BASE_URL } from "@/lib/api"
+import { IAccessory, IBrand, ISparePart } from "@/types/product"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 
 export default function Home() {
   const [accessories, setAccessories] = useState<IAccessory[]>([])
   const [spareParts, setSpareParts] = useState<ISparePart[]>([])
-
+  const [brands, setBrands] = useState<IBrand[]>([])
+    
   useEffect(() => {
     async function fetchData() {
       try {
@@ -33,6 +34,7 @@ export default function Home() {
         console.error("Error fetching accessories or spare parts", error)
       }
     }
+    getBrands().then((data) => setBrands(data || []))
     fetchData()
   }, [])
 
@@ -88,7 +90,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredAccessories.map((accessory) => (
-              <AccessoryCard key={accessory._id} accessory={accessory} />
+              <AccessoryCard key={accessory._id} accessory={accessory} brands={brands} />
             ))}
           </div>
           
@@ -115,7 +117,7 @@ export default function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {featuredSpareParts.map((sparePart) => (
-              <SparePartCard key={sparePart._id} sparePart={sparePart} />
+              <SparePartCard key={sparePart._id} sparePart={sparePart} brands={brands} />
             ))}
           </div>
           

@@ -6,7 +6,7 @@ import { Grid, List, Search } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
-import { API_BASE_URL } from "@/lib/api"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 interface Dimensions {
   length: number
   width: number
@@ -51,6 +51,7 @@ export default function ProductsPage() {
   const [brandFilter, setBrandFilter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [layout, setLayout] = useState<"grid" | "list">("grid")
+  const [brands, setBrands] = useState([])
 
   // Fetch products dynamically from the API on mount
   useEffect(() => {
@@ -69,6 +70,12 @@ export default function ProductsPage() {
       }
     }
     fetchProducts()
+    getBrands().then((data) => {
+      if (data) {
+        setBrands(data)
+      }
+    }
+    )
   }, [])
 
   // Compute unique filter options from the fetched products
@@ -303,7 +310,7 @@ export default function ProductsPage() {
             }
           >
             {filteredProducts.map((product) => (
-              <ProductCard key={product._id} product={product} layout={layout} />
+              <ProductCard key={product._id} product={product} layout={layout} brands={brands} />
             ))}
           </div>
 

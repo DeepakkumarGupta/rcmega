@@ -415,7 +415,7 @@ export default function AccessoryDetailPage() {
               <h2 className="text-2xl font-bold text-white mb-6">Compatible Products</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {compatibleProducts.map((product) => (
-                  <ProductCard key={product._id} product={product} layout="grid" />
+                  <ProductCard key={product._id} product={product} brands={brands} layout="grid" />
                 ))}
               </div>
             </section>

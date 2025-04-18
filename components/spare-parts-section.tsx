@@ -4,14 +4,16 @@ import { useState } from "react"
 import SparePartCard from "@/components/spare-part-card"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import Link from "next/link"
-import { ISparePart } from "@/types/product"
+import { IBrand, ISparePart } from "@/types/product"
 
 export default function SparePartsSection({
   spareParts,
   title = "Compatible Spare Parts",
+  brands = [],
 }: {
   spareParts: ISparePart[]
   title?: string
+  brands: IBrand[]
 }) {
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 4
@@ -63,7 +65,7 @@ export default function SparePartsSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentSpareParts.map((sparePart) => (
-          <SparePartCard key={sparePart._id} sparePart={sparePart} />
+          <SparePartCard key={sparePart._id} sparePart={sparePart} brands={brands}/>
         ))}
       </div>
 

@@ -4,14 +4,16 @@ import { useState } from "react"
 import AccessoryCard from "@/components/accessory-card"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import Link from "next/link"
-import { IAccessory } from "@/types/product"
+import { IAccessory, IBrand } from "@/types/product"
 
 export default function AccessoriesSection({
   accessories,
   title = "Compatible Accessories",
+  brands = [],
 }: {
   accessories: IAccessory[]
   title?: string
+  brands: IBrand[]
 }) {
   const [currentPage, setCurrentPage] = useState(0)
   const itemsPerPage = 4
@@ -63,7 +65,7 @@ export default function AccessoriesSection({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {currentAccessories.map((accessory) => (
-          <AccessoryCard key={accessory._id} accessory={accessory} />
+          <AccessoryCard key={accessory._id} accessory={accessory} brands={brands}/>
         ))}
       </div>
 

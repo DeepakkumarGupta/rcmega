@@ -2,23 +2,20 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+
 import { FaWhatsapp } from "react-icons/fa6"
 import { IBrand, ISparePart } from "@/types/product"
-import { getBrands } from "@/lib/api"
+
 
 export default function SparePartCard({
   sparePart,
   layout = "grid",
+  brands = [],
 }: {
   sparePart: ISparePart
   layout?: "grid" | "list"
+  brands: IBrand[]
 }) {
-  const [brands, setBrands] = useState<IBrand[]>([])
-  
-  useEffect(() => {
-    getBrands().then((data) => setBrands(data || []))
-  }, [])
 
   // Find the brand object for this spare part
   const brandObj = brands.find(

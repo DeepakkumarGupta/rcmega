@@ -1,22 +1,27 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import AccessoryCard from "@/components/accessory-card"
-import { Grid, List, Search } from "lucide-react"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
-import Head from "next/head"
-import { IAccessory, ICategoryAccessory } from "@/types/product"
-import { API_BASE_URL } from "@/lib/api"
+import { useState, useEffect } from "react";
+import AccessoryCard from "@/components/accessory-card";
+import { Grid, List, Search } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Head from "next/head";
+import { IAccessory, IBrand, ICategoryAccessory } from "@/types/product";
+import { API_BASE_URL, getBrands } from "@/lib/api";
 
 export default function AccessoriesPage() {
-  const [accessories, setAccessories] = useState<IAccessory[]>([])
-  const [accessoryCategories, setAccessoryCategories] = useState<ICategoryAccessory[]>([])
-  const [filteredAccessories, setFilteredAccessories] = useState<IAccessory[]>([])
-  const [sortBy, setSortBy] = useState("best-selling")
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [layout, setLayout] = useState<"grid" | "list">("grid")
+  const [accessories, setAccessories] = useState<IAccessory[]>([]);
+  const [accessoryCategories, setAccessoryCategories] = useState<
+    ICategoryAccessory[]
+  >([]);
+  const [filteredAccessories, setFilteredAccessories] = useState<IAccessory[]>(
+    []
+  );
+  const [sortBy, setSortBy] = useState("best-selling");
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [layout, setLayout] = useState<"grid" | "list">("grid");
+  const [brands, setBrands] = useState<IBrand[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -24,54 +29,57 @@ export default function AccessoriesPage() {
         const [accRes, catRes] = await Promise.all([
           fetch(`${API_BASE_URL}/accessories`),
           fetch(`${API_BASE_URL}/categoriesaccessory`),
-        ])
-        const accJson = await accRes.json()
-        const catJson = await catRes.json()
-        console.log(accJson, catJson)
-        if (accJson.success) setAccessories(accJson.data)
-        if (catJson.success) setAccessoryCategories(catJson.data)
+        ]);
+        const accJson = await accRes.json();
+        const catJson = await catRes.json();
+        console.log(accJson, catJson);
+        if (accJson.success) setAccessories(accJson.data);
+        if (catJson.success) setAccessoryCategories(catJson.data);
       } catch (error) {
-        console.error("Error fetching accessories or categories", error)
+        console.error("Error fetching accessories or categories", error);
       }
     }
-    fetchData()
-  }, [])
+    getBrands().then((data) => setBrands(data || []));
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    let filtered = [...accessories]
+    let filtered = [...accessories];
 
     // Apply search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (a) =>
           a.name.toLowerCase().includes(query) ||
           a.sku.toLowerCase().includes(query) ||
           a.brand.toLowerCase().includes(query) ||
-          a.categories.some((category) => category.toLowerCase().includes(query)),
-      )
+          a.categories.some((category) =>
+            category.toLowerCase().includes(query)
+          )
+      );
     }
 
     // Apply category filter
     if (categoryFilter) {
-      filtered = filtered.filter((a) => a.categories.includes(categoryFilter))
+      filtered = filtered.filter((a) => a.categories.includes(categoryFilter));
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price-low":
-          return a.price - b.price
+          return a.price - b.price;
         case "price-high":
-          return b.price - a.price
+          return b.price - a.price;
         case "best-selling":
         default:
-          return 0
+          return 0;
       }
-    })
+    });
 
-    setFilteredAccessories(filtered)
-  }, [accessories, sortBy, categoryFilter, searchQuery])
+    setFilteredAccessories(filtered);
+  }, [accessories, sortBy, categoryFilter, searchQuery]);
 
   return (
     <>
@@ -106,7 +114,9 @@ export default function AccessoriesPage() {
                     <button
                       onClick={() => setLayout("grid")}
                       className={`p-2 rounded-full transition-colors ${
-                        layout === "grid" ? "bg-white text-[#1B1F3B]" : "text-white hover:bg-white/20"
+                        layout === "grid"
+                          ? "bg-white text-[#1B1F3B]"
+                          : "text-white hover:bg-white/20"
                       }`}
                       role="radio"
                       aria-checked={layout === "grid"}
@@ -118,7 +128,9 @@ export default function AccessoriesPage() {
                     <button
                       onClick={() => setLayout("list")}
                       className={`p-2 rounded-full transition-colors ${
-                        layout === "list" ? "bg-white text-[#1B1F3B]" : "text-white hover:bg-white/20"
+                        layout === "list"
+                          ? "bg-white text-[#1B1F3B]"
+                          : "text-white hover:bg-white/20"
                       }`}
                       role="radio"
                       aria-checked={layout === "list"}
@@ -144,8 +156,18 @@ export default function AccessoriesPage() {
                       <option value="price-high">Price: High to Low</option>
                     </select>
                     <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -158,7 +180,9 @@ export default function AccessoriesPage() {
                     <select
                       id="category-filter"
                       value={categoryFilter || ""}
-                      onChange={(e) => setCategoryFilter(e.target.value || null)}
+                      onChange={(e) =>
+                        setCategoryFilter(e.target.value || null)
+                      }
                       className="bg-white/10 text-white rounded-lg pl-3 pr-8 py-2 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#F26522]"
                     >
                       <option value="">All Categories</option>
@@ -169,8 +193,18 @@ export default function AccessoriesPage() {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -201,15 +235,23 @@ export default function AccessoriesPage() {
             }
           >
             {filteredAccessories.map((accessory) => (
-              <AccessoryCard key={accessory._id} accessory={accessory} layout={layout} />
+              <AccessoryCard
+                key={accessory._id}
+                accessory={accessory}
+                brands={brands}
+                layout={layout}
+              />
             ))}
           </div>
 
           {filteredAccessories.length === 0 && (
             <div className="text-center py-12">
-              <h2 className="text-2xl font-bold text-white mb-4">No accessories found</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">
+                No accessories found
+              </h2>
               <p className="text-white/70">
-                Try changing your search query or filters, or check back later for new items.
+                Try changing your search query or filters, or check back later
+                for new items.
               </p>
             </div>
           )}
@@ -218,6 +260,5 @@ export default function AccessoriesPage() {
         <Footer />
       </div>
     </>
-  )
+  );
 }
-

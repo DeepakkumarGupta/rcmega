@@ -2,22 +2,20 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+
 import { FaWhatsapp } from "react-icons/fa6"
 import { IAccessory, IBrand } from "@/types/product"
-import { getBrands } from "@/lib/api"
+
 
 export default function AccessoryCard({
   accessory,
+  brands,
   layout = "grid",
 }: {
   accessory: IAccessory
+  brands: IBrand[]
   layout?: "grid" | "list"
 }) {
-  const [brands, setBrands] = useState<IBrand[]>([])
-  useEffect(() => {
-    getBrands().then((data) => setBrands(data || []))
-  }, [])
 
   // Find the brand object for this accessory
   const brandObj = brands.find(

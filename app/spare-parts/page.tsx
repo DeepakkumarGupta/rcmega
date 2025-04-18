@@ -6,8 +6,8 @@ import { Grid, List, Search } from "lucide-react"
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
 import Head from "next/head"
-import { ISparePart } from "@/types/product"
-import { API_BASE_URL } from "@/lib/api"
+import { IBrand, ISparePart } from "@/types/product"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 
 export default function SparePartsPage() {
   const [spareParts, setSpareParts] = useState<ISparePart[]>([])
@@ -17,6 +17,7 @@ export default function SparePartsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [layout, setLayout] = useState<"grid" | "list">("grid")
+  const [brands, setBrands] = useState<IBrand[]>([])
 
   useEffect(() => {
     async function fetchData() {
@@ -34,6 +35,11 @@ export default function SparePartsPage() {
       }
     }
     fetchData()
+    getBrands().then((data) => {
+      if (data) {
+        setBrands(data)
+      }
+    })
   }, [])
 
   useEffect(() => {
@@ -193,7 +199,7 @@ export default function SparePartsPage() {
             }
           >
             {filteredSpareParts.map((sparePart) => (
-              <SparePartCard key={sparePart._id} sparePart={sparePart} layout={layout} />
+              <SparePartCard key={sparePart._id} sparePart={sparePart} layout={layout} brands={brands} />
             ))}
           </div>
 

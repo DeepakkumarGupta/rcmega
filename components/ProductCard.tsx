@@ -1,38 +1,32 @@
-"use client"
-import Image from "next/image"
-import Link from "next/link"
-import { getBrands } from "@/lib/api"
-import { Swiper, SwiperSlide } from "swiper/react"
-import { Pagination } from "swiper/modules"
-import "swiper/css"
-import "swiper/css/pagination"
-import { FaWhatsapp } from "react-icons/fa6"
-import { IBrand, IProduct } from "@/types/product"
-import { useEffect, useState } from "react"
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { FaWhatsapp } from "react-icons/fa6";
+import { IBrand, IProduct } from "@/types/product";
+
 
 export default function ProductCard({
   product,
   layout,
+  brands
 }: {
-  product: IProduct
-  layout: "grid" | "list"
+  product: IProduct;
+  layout: "grid" | "list";
+  brands: IBrand[];
 }) {
+
   const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Can you provide more details.?`
-
-  // Store brands as an array
-  const [brands, setBrands] = useState<IBrand[]>([])
-
   // Filter only the first 3 images from the media array
-  const productImages = product.media.filter((media) => media.type === "image").slice(0, 3)
-  
-  useEffect(() => {
-    getBrands().then((data) => setBrands(data || []))
-  }, [])
+  const productImages = product.media
+    .filter((media) => media.type === "image")
+    .slice(0, 3);
 
   // Find the brand object for this product
-  const brandObj = brands.find(
-    (b) =>  b.name === product.brand
-  )
+  const brandObj = brands.find((b) => b.name === product.brand);
 
   return (
     <div
@@ -44,10 +38,16 @@ export default function ProductCard({
 
       <Link
         href={`/products/${product.slug}`}
-        className={`block relative ${layout === "list" ? "md:w-1/3" : "w-full"}`}
+        className={`block relative ${
+          layout === "list" ? "md:w-1/3" : "w-full"
+        }`}
       >
         <div className="relative aspect-square rounded-xl overflow-hidden">
-          <Swiper modules={[Pagination]} pagination={{ clickable: true }} className="h-full w-full">
+          <Swiper
+            modules={[Pagination]}
+            pagination={{ clickable: true }}
+            className="h-full w-full"
+          >
             {productImages.map((media, index) => (
               <SwiperSlide key={index}>
                 <Image
@@ -84,25 +84,37 @@ export default function ProductCard({
       {/* Info Section */}
       <div className={` flex-1 ${layout === "list" ? "md:py-2" : "pt-3"}`}>
         <Link href={`/products/${product.slug}`}>
-          <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 hover:text-blue-600">{product.name}</h3>
+          <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 hover:text-blue-600">
+            {product.name}
+          </h3>
         </Link>
 
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-gray-500 text-sm">Model: {product.modelCode}</span>
+          <span className="text-gray-500 text-sm">
+            Model: {product.modelCode}
+          </span>
         </div>
 
         <div className="flex flex-wrap gap-2 mb-3">
-          <span className="px-2 py-1 bg-gray-100 rounded-md text-xs">Scale: {product.scale}</span>
-          <span className="px-2 py-1 bg-gray-100 rounded-md text-xs">Color: {product.color}</span>
+          <span className="px-2 py-1 bg-gray-100 rounded-md text-xs">
+            Scale: {product.scale}
+          </span>
+          <span className="px-2 py-1 bg-gray-100 rounded-md text-xs">
+            Color: {product.color}
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <p className="text-lg font-bold text-gray-900">₹{product.price.toLocaleString()}</p>
+          <p className="text-lg font-bold text-gray-900">
+            ₹{product.price.toLocaleString()}
+          </p>
 
           <div className="flex gap-2">
             {product.OutOfStock ? (
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`Hi! I'm interested in ${product.name}. Please notify me when it's back in stock.`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Hi! I'm interested in ${product.name}. Please notify me when it's back in stock.`
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
@@ -123,7 +135,7 @@ export default function ProductCard({
             )}
             <button
               onClick={() => {
-                const url = `${window.location.origin}/products/${product.slug}`
+                const url = `${window.location.origin}/products/${product.slug}`;
                 if (navigator.share) {
                   navigator
                     .share({
@@ -132,12 +144,12 @@ export default function ProductCard({
                       url: url,
                     })
                     .catch(() => {
-                      navigator.clipboard.writeText(url)
-                      alert("Link copied to clipboard!")
-                    })
+                      navigator.clipboard.writeText(url);
+                      alert("Link copied to clipboard!");
+                    });
                 } else {
-                  navigator.clipboard.writeText(url)
-                  alert("Link copied to clipboard!")
+                  navigator.clipboard.writeText(url);
+                  alert("Link copied to clipboard!");
                 }
               }}
               className="flex items-center justify-center bg-gray-200 text-gray-700 p-2 rounded-lg hover:bg-gray-300"
@@ -165,6 +177,5 @@ export default function ProductCard({
         </div>
       </div>
     </div>
-  )
+  );
 }
-

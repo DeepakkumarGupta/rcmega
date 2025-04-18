@@ -4,10 +4,11 @@ import { useEffect, useState } from "react"
 import ProductCard from "@/components/ProductCard"
 import Link from "next/link"
 import { IProduct } from "@/types/product"
-import { API_BASE_URL } from "@/lib/api"
+import { API_BASE_URL, getBrands } from "@/lib/api"
 
 export default function TopProductsSection() {
   const [products, setProducts] = useState<IProduct[]>([])
+  const [brands, setBrands] = useState([])
   const layout: "grid" | "list" = "grid"
 
   useEffect(() => {
@@ -24,6 +25,12 @@ export default function TopProductsSection() {
       }
     }
     fetchProducts()
+    getBrands().then((data) => {
+      if (data) {
+        setBrands(data)
+      }
+    }
+    )
   }, [])
 
   const topProducts = products.slice(0, 8)
@@ -36,7 +43,7 @@ export default function TopProductsSection() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {topProducts.map((product) => (
-            <ProductCard key={product._id} product={product} layout={layout} />
+            <ProductCard key={product._id} product={product} layout={layout} brands={brands}  />
           ))}
         </div>
         <div className="text-center py-8">
