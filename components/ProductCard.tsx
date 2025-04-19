@@ -5,8 +5,9 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { FaWhatsapp } from "react-icons/fa6";
+import { FaAmazonPay, FaWhatsapp } from "react-icons/fa6";
 import { IBrand, IProduct } from "@/types/product";
+import { load } from "@cashfreepayments/cashfree-js";
 
 
 export default function ProductCard({
@@ -18,8 +19,90 @@ export default function ProductCard({
   layout: "grid" | "list";
   brands: IBrand[];
 }) {
+  // Function to get session ID for CashFree Payment Gateway
+  const getSessionID = async (): Promise<string | undefined> => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId: `order_${Date.now()}`,
+            orderAmount: product.price,
+            customerDetails: {
+              customer_id: `customer_${Date.now()}`,
+              customer_email: "debugrror@gmail.com",
+              customer_phone: "+91993964432",
+            } // Replace with actual customer email
+          }),
+        }
+      );
 
-  const whatsappMessage = `Hi! I'm interested in ${product.name} (${product.modelCode}). Price: ₹${product.price.toLocaleString()}. Can you provide more details.?`
+      if (!response.ok) {
+        // throw new Error("Failed to create session");
+        return "Failed to create session";
+      }
+
+      const data = await response.json();
+      return data.data.payment_session_id;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const hadelBuyNow = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+    e.preventDefault();
+    try {
+      const sessionId = await getSessionID();
+
+      if (!sessionId) {
+        throw new Error("Session ID not received");
+      }
+
+      // Initiate the Cashfree Checkout
+  // Initialize Cashfree SDK and wait for it to load
+  const cashfree = await load({
+    mode: "sandbox"
+  });
+
+  const checkoutOptions = {
+    paymentSessionId: sessionId,
+    redirectTarget: "_target",
+    // redirectTarget: document.getElementById("cf_checkout"),
+  };
+
+  if (cashfree) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    cashfree.checkout(checkoutOptions).then((result: any) => {
+      if(result.error){
+          // This will be true when there is any error during the payment
+          console.log("There is some payment error, Check for Payment Status");
+          console.log(result.error);
+      }
+      if(result.redirect){
+          // This will be true when the payment redirection page couldnt be opened in the same window
+          // This is an exceptional case only when the page is opened inside an inAppBrowser
+          // In this case the customer will be redirected to return url once payment is completed
+          console.log("Payment will be redirected");
+      }
+      if(result.paymentDetails){
+          // This will be called whenever the payment is completed irrespective of transaction status
+          console.log("Payment has been completed, Check for Payment Status");
+          console.log(result.paymentDetails.paymentMessage);
+      }
+    });
+  } else {
+    console.error("Cashfree SDK failed to load.");
+  }
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Filter only the first 3 images from the media array
   const productImages = product.media
     .filter((media) => media.type === "image")
@@ -123,16 +206,16 @@ export default function ProductCard({
                 <span className="sm:inline">Notify Me</span>
               </a>
             ) : (
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`}
-                target="_blank"
+              <button
+                onClick={hadelBuyNow}
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700"
               >
-                <FaWhatsapp size={16} />
                 <span className="sm:inline">Buy Now</span>
-              </a>
+                <FaAmazonPay size={16} />
+              </button>
             )}
+            <div id="cf_checkout"></div>
             <button
               onClick={() => {
                 const url = `${window.location.origin}/products/${product.slug}`;
